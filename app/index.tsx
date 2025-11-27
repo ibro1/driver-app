@@ -1,20 +1,22 @@
-import { Redirect, router } from "expo-router";
+import { Redirect } from "expo-router";
 import { useEffect, useState } from "react";
 import { View, ActivityIndicator } from "react-native";
 import { useAuth } from "@/lib/auth-context";
 import { getDriverProfile } from "@/lib/auth-api";
 
 const Page = () => {
-  const { isSignedIn, isLoaded } = useAuth();
+  const { user, isSignedIn, isLoaded } = useAuth();
   const [isDriver, setIsDriver] = useState<boolean | null>(null);
   const [checkingDriver, setCheckingDriver] = useState(false);
 
   useEffect(() => {
     const checkDriverStatus = async () => {
-      if (isSignedIn) {
+      if (isSignedIn && user) {
         setCheckingDriver(true);
         try {
-          const profile = await getDriverProfile();
+          // getDriverProfile now takes userId optionally or uses session
+          // Assuming getDriverProfile handles it
+          const profile = await getDriverProfile(user.id);
           if (profile && profile.driver) {
             setIsDriver(true);
           } else {
@@ -32,7 +34,7 @@ const Page = () => {
     if (isLoaded && isSignedIn) {
       checkDriverStatus();
     }
-  }, [isLoaded, isSignedIn]);
+  }, [isLoaded, isSignedIn, user]);
 
   if (!isLoaded || (isSignedIn && checkingDriver)) {
     return (
@@ -48,6 +50,8 @@ const Page = () => {
     } else if (isDriver === false) {
       return <Redirect href="/(auth)/onboarding" />;
     }
+    // If checkingDriver is false but isDriver is null (shouldn't happen if signed in), wait or default
+    return <Redirect href="/(auth)/onboarding" />;
   }
 
   return <Redirect href="/(auth)/welcome" />;

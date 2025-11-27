@@ -40,10 +40,14 @@ export const signInWithEmail = async (
     }
 
     const data = await response.json();
+    console.log("Sign in response data:", data);
 
     // Store session token
     if (data.session?.token) {
+        console.log("Saving session token:", data.session.token);
         await SecureStore.setItemAsync("session_token", data.session.token);
+    } else {
+        console.log("No session token in sign in response");
     }
 
     return data;
@@ -78,10 +82,14 @@ export const signUpWithEmail = async (
     }
 
     const data = await response.json();
+    console.log("Sign up response data:", data);
 
     // Store session token if provided
     if (data.session?.token) {
+        console.log("Saving session token:", data.session.token);
         await SecureStore.setItemAsync("session_token", data.session.token);
+    } else {
+        console.log("No session token in sign up response");
     }
 
     return data;
@@ -165,6 +173,7 @@ export const signOutUser = async (): Promise<void> => {
  */
 export const getSession = async (): Promise<any> => {
     const token = await SecureStore.getItemAsync("session_token");
+    console.log("getSession: Token from SecureStore:", token ? "Exists" : "Null");
 
     if (!token) {
         return null;
@@ -180,8 +189,11 @@ export const getSession = async (): Promise<any> => {
             },
         });
 
+        console.log("getSession: Response status:", response.status);
+
         if (!response.ok) {
             // Session expired or invalid
+            console.log("getSession: Session invalid, deleting token");
             await SecureStore.deleteItemAsync("session_token");
             return null;
         }
@@ -191,6 +203,76 @@ export const getSession = async (): Promise<any> => {
         console.error("Get session error:", error);
         return null;
     }
+};
+
+/**
+ * Register as a driver
+ */
+export const registerDriver = async (
+    firstName: string,
+    lastName: string,
+    phone: string,
+    licenseNumber: string,
+    vehicleType: string,
+    vehicleMake: string,
+    vehicleModel: string,
+    vehicleYear: number,
+    vehicleColor: string,
+    vehiclePlateNumber: string,
+    vehicleSeats: number
+): Promise<any> => {
+    const token = await SecureStore.getItemAsync("session_token");
+    if (!token) throw new Error("Not authenticated");
+
+    const response = await fetch(`${API_URL}/api/driver/register`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+            first_name: firstName,
+            last_name: lastName,
+            phone,
+            license_number: licenseNumber,
+            vehicle_type: vehicleType,
+            vehicle_make: vehicleMake,
+            vehicle_model: vehicleModel,
+            vehicle_year: vehicleYear,
+            vehicle_color: vehicleColor,
+            vehicle_plate_number: vehiclePlateNumber,
+            vehicle_seats: vehicleSeats,
+        }),
+    });
+
+    if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || error.error || "Failed to register driver");
+    }
+
+    return await response.json();
+};
+
+/**
+ * Get driver profile
+ */
+export const getDriverProfile = async (userId?: string): Promise<any> => {
+    const token = await SecureStore.getItemAsync("session_token");
+    if (!token) return null;
+
+    const response = await fetch(`${API_URL}/api/driver/status`, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+        },
+    });
+
+    if (!response.ok) {
+        return null;
+    }
+
+    return await response.json();
 };
 
 /**

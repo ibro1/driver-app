@@ -51,9 +51,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
     const loadSession = async () => {
         try {
+            console.log("Loading session...");
             const session = await getSessionAPI();
+            console.log("Session loaded:", session);
             if (session?.user) {
                 setUser(session.user);
+            } else {
+                console.log("No user in session");
             }
         } catch (error) {
             console.error("Failed to load session:", error);

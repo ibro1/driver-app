@@ -10,6 +10,7 @@ import { useAuth } from "@/lib/auth-context";
 
 const SignIn = () => {
   const { signIn, isLoaded } = useAuth();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [form, setForm] = useState({
     email: "",
@@ -18,6 +19,7 @@ const SignIn = () => {
 
   const onSignInPress = useCallback(async () => {
     if (!isLoaded) return;
+    setIsSubmitting(true);
 
     try {
       await signIn(form.email, form.password);
@@ -25,6 +27,8 @@ const SignIn = () => {
     } catch (err: any) {
       console.error("Sign in error:", err);
       Alert.alert("Error", err.message || "Log in failed. Please try again.");
+    } finally {
+      setIsSubmitting(false);
     }
   }, [isLoaded, form, signIn]);
 
@@ -62,6 +66,7 @@ const SignIn = () => {
             title="Sign In"
             onPress={onSignInPress}
             className="mt-6"
+            isLoading={isSubmitting}
           />
 
           <OAuth />
