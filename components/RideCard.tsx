@@ -11,7 +11,7 @@ const RideCard = ({ ride }: { ride: Ride }) => {
         <View className="flex flex-row items-center justify-between">
           <Image
             source={{
-              uri: `https://maps.geoapify.com/v1/staticmap?style=osm-bright&width=600&height=400&center=lonlat:${ride.destination_longitude},${ride.destination_latitude}&zoom=14&apiKey=${process.env.EXPO_PUBLIC_GEOAPIFY_API_KEY}`,
+              uri: `https://maps.googleapis.com/maps/api/staticmap?center=${ride.destination_latitude},${ride.destination_longitude}&zoom=14&size=600x400&key=${process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY}`,
             }}
             className="w-[80px] h-[90px] rounded-lg"
           />
