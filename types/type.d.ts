@@ -54,6 +54,13 @@ declare interface Ride {
     last_name: string;
     car_seats: number;
   };
+  rider: {
+    id: string;
+    name: string;
+    email: string;
+    image: string;
+    rating: string;
+  };
 }
 
 declare interface ButtonProps extends TouchableOpacityProps {

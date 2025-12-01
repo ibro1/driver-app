@@ -4,8 +4,9 @@ import { useAuth } from "@/lib/auth-context";
 import * as Location from "expo-location";
 import Map from "@/components/Map";
 import { icons } from "@/constants";
-import { updateDriverStatus, updateDriverLocation, getDriverProfile } from "@/lib/auth-api";
+import { updateDriverStatus, updateDriverLocation, getDriverProfile, acceptRide } from "@/lib/auth-api";
 import RideRequestSheet from "@/components/RideRequestSheet";
+import { router } from "expo-router";
 
 import { useLocationStore } from "@/store";
 import { getSocket } from "@/lib/socket";
@@ -18,6 +19,7 @@ const DriverHome = () => {
     const [isOnline, setIsOnline] = useState(false);
     const [location, setLocation] = useState<Location.LocationObject | null>(null);
     const [rideRequest, setRideRequest] = useState<any>(null);
+    const [acceptingRide, setAcceptingRide] = useState(false);
 
     useEffect(() => {
         const requestLocation = async () => {
@@ -41,34 +43,54 @@ const DriverHome = () => {
     }, []);
 
     useEffect(() => {
-        const initDriver = async () => {
+        const initDriverAndSocket = async () => {
             if (user) {
                 try {
                     const response = await getDriverProfile(user.id);
-                    if (response && response.driver && response.driver.status === 'online') {
-                        setIsOnline(true);
+                    console.log("Driver Profile Response:", JSON.stringify(response, null, 2));
+
+                    if (response && response.driver) {
+                        const driverId = response.driver.id;
+
+                        // 1. Set online status
+                        if (response.driver.status === 'online' || response.driver.status === 'busy') {
+                            setIsOnline(true);
+                        }
+
+                        // 2. Setup Socket
+                        const socket = getSocket();
+                        socket.emit("join_driver_room", driverId);
+                        console.log("Joined driver room:", driverId);
+
+                        socket.on("new_ride_request", (data) => {
+                            console.log("New ride request received:", data);
+                            setRideRequest(data);
+                        });
+
+                        // 3. Check for pending request
+                        if (response.pendingRequest) {
+                            console.log("Found pending request:", response.pendingRequest);
+                            setRideRequest(response.pendingRequest);
+                        }
+
+                        // 4. Redirect if active ride
+                        if (response.activeRide) {
+                            console.log("Resuming active ride:", response.activeRide.rideId);
+                            router.replace(`/(root)/ride/${response.activeRide.rideId}`);
+                        }
                     }
                 } catch (err) {
-                    console.log("Error fetching driver profile", err);
+                    console.log("Error initializing driver:", err);
                 }
             }
-        }
-        initDriver();
-    }, [user]);
+        };
 
-    // Socket listener for ride requests
-    useEffect(() => {
-        const socket = getSocket();
-        if (user?.id) {
-            socket.emit("join_driver_room", user.id);
+        initDriverAndSocket();
 
-            socket.on("new_ride_request", (data) => {
-                setRideRequest(data);
-            });
-        }
         return () => {
+            const socket = getSocket();
             socket.off("new_ride_request");
-        }
+        };
     }, [user]);
 
     // Periodic location update if online
@@ -107,12 +129,29 @@ const DriverHome = () => {
         }
     };
 
-    const handleAcceptRide = () => {
-        // Logic to accept ride (API call + socket emit)
-        // For now just close sheet and navigate
-        setRideRequest(null);
-        // router.push(`/(root)/ride/${rideRequest.rideId}`);
-        Alert.alert("Success", "Ride Accepted!");
+    const handleAcceptRide = async () => {
+        if (!rideRequest || !user) return;
+
+        setAcceptingRide(true);
+        try {
+            // 1. Call API to accept ride
+            await acceptRide(rideRequest.rideId);
+
+            // 2. Emit socket event
+            const socket = getSocket();
+            socket.emit("ride_accepted", {
+                rideId: rideRequest.rideId,
+                driverId: user.id,
+            });
+
+            // 3. Navigate to ride screen
+            setRideRequest(null);
+            router.push(`/(root)/ride/${rideRequest.rideId}`);
+        } catch (error: any) {
+            Alert.alert("Error", error.message || "Failed to accept ride");
+        } finally {
+            setAcceptingRide(false);
+        }
     };
 
     const handleDeclineRide = () => {
@@ -168,6 +207,7 @@ const DriverHome = () => {
                 request={rideRequest}
                 onAccept={handleAcceptRide}
                 onDecline={handleDeclineRide}
+                loading={acceptingRide}
             />
         </View>
     );

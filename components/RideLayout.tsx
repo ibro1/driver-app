@@ -14,10 +14,12 @@ const RideLayout = ({
   title,
   snapPoints,
   children,
+  map,
 }: {
   title: string;
   snapPoints?: string[];
   children: React.ReactNode;
+  map?: React.ReactNode;
 }) => {
   const bottomSheetRef = useRef<BottomSheet>(null);
 
@@ -40,7 +42,7 @@ const RideLayout = ({
             </Text>
           </View>
 
-          <Map />
+          {map || <Map />}
         </View>
 
         <BottomSheet
