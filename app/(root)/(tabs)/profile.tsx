@@ -73,19 +73,28 @@ const Profile = () => {
           </View>
         </View>
 
+        {/* Wallet Balance Card */}
+        <View className="bg-[#0286FF] p-5 rounded-2xl shadow-md mb-6">
+          <View className="flex-row justify-between items-center mb-2">
+            <Text className="text-white/80 font-JakartaMedium text-sm">Wallet Balance</Text>
+            <View className="bg-white/20 p-2 rounded-full">
+              <Image source={icons.dollar} className="w-4 h-4" tintColor="white" resizeMode="contain" />
+            </View>
+          </View>
+          <Text className="text-3xl font-JakartaBold text-white">
+            ₦{driver?.walletBalance?.toFixed(2) || "0.00"}
+          </Text>
+        </View>
+
         {/* Stats Grid */}
         <View className="flex-row justify-between mb-6">
           <View className="bg-neutral-50 p-4 rounded-2xl flex-1 mr-2 items-center">
             <Text className="text-2xl font-JakartaBold text-primary-500">{stats?.totalRides || 0}</Text>
             <Text className="text-xs text-neutral-500 font-JakartaMedium mt-1">Total Rides</Text>
           </View>
-          <View className="bg-neutral-50 p-4 rounded-2xl flex-1 mx-2 items-center">
+          <View className="bg-neutral-50 p-4 rounded-2xl flex-1 ml-2 items-center">
             <Text className="text-2xl font-JakartaBold text-green-500">{stats?.yearsActive || 1}</Text>
             <Text className="text-xs text-neutral-500 font-JakartaMedium mt-1">Years Active</Text>
-          </View>
-          <View className="bg-neutral-50 p-4 rounded-2xl flex-1 ml-2 items-center">
-            <Text className="text-lg font-JakartaBold text-neutral-800">₦{driver?.walletBalance?.toFixed(0) || "0"}</Text>
-            <Text className="text-xs text-neutral-500 font-JakartaMedium mt-1">Balance</Text>
           </View>
         </View>
 
