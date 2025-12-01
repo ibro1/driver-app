@@ -148,6 +148,6 @@ export const useAuth = () => {
 };
 
 export const useUser = () => {
-    const { user } = useAuth();
-    return { user };
+    const context = useAuth();
+    return { ...context, logout: context.signOut };
 };
