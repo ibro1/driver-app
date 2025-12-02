@@ -1,6 +1,6 @@
 import { useLocalSearchParams, router } from "expo-router";
 import { useEffect, useState, useRef } from "react";
-import { View, Text, ActivityIndicator, Image, Alert } from "react-native";
+import { View, Text, ActivityIndicator, Image, Alert, TouchableOpacity } from "react-native";
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import MapViewDirections from "react-native-maps-directions";
 import * as Location from "expo-location";
@@ -178,17 +178,23 @@ const RideScreen = () => {
                 </Text>
 
                 <View className="flex-row items-center justify-between bg-general-600 rounded-2xl p-4 mb-5 w-full">
-                    <View className="items-center flex-row">
+                    <View className="items-center flex-row flex-1">
                         <Avatar
                             source={ride.rider?.image}
                             name={ride.rider?.name || "Rider"}
                             size={12}
                         />
-                        <View className="ml-4">
+                        <View className="ml-4 flex-1">
                             <Text className="text-lg font-JakartaSemiBold">{ride.rider?.name || "Rider"}</Text>
                             <Text className="text-gray-500">{ride.rider?.rating || "5.0"} ★</Text>
                         </View>
                     </View>
+                    <TouchableOpacity
+                        onPress={() => router.push(`/(root)/chat/${id}` as any)}
+                        className="bg-primary-500 p-3 rounded-full ml-3"
+                    >
+                        <Image source={icons.chat} className="w-6 h-6" tintColor="white" resizeMode="contain" />
+                    </TouchableOpacity>
                 </View>
 
                 <View className="w-full mb-5">
