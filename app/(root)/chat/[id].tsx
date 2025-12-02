@@ -37,7 +37,8 @@ const ChatDetails = () => {
     const [inputText, setInputText] = useState("");
     const flatListRef = useRef<FlatList>(null);
 
-    const { data: ride, loading: rideLoading } = useFetch<Ride>(`/api/rides/${id}`);
+    const { data: rideResponse, loading: rideLoading } = useFetch<{ data: Ride }>(`/api/rides/${id}`);
+    const ride = rideResponse?.data;
     const { data: history, loading: historyLoading } = useFetch<{ data: Message[] }>(`/api/chat/${id}`);
 
     useEffect(() => {
