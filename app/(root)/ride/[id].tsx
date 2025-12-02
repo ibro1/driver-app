@@ -16,7 +16,8 @@ import Avatar from "@/components/Avatar";
 
 const RideScreen = () => {
     const { id } = useLocalSearchParams();
-    const { data: ride, loading, error } = useFetch<Ride>(`/api/rides/${id}`);
+    const { data: response, loading, error } = useFetch<{ data: Ride }>(`/api/rides/${id}`);
+    const ride = response?.data;
     const [status, setStatus] = useState<string>("accepted");
     const [driverLocation, setDriverLocation] = useState<Location.LocationObject | null>(null);
     const [isUpdating, setIsUpdating] = useState(false);
@@ -108,58 +109,65 @@ const RideScreen = () => {
 
     return (
         <RideLayout title="Current Ride" snapPoints={["50%", "85%"]} map={
-            <MapView
-                ref={mapRef}
-                provider={PROVIDER_GOOGLE}
-                style={{ flex: 1 }}
-                mapPadding={{ top: 120, right: 20, bottom: 20, left: 20 }}
-                initialRegion={{
-                    latitude: ride.origin_latitude,
-                    longitude: ride.origin_longitude,
-                    latitudeDelta: 0.02,
-                    longitudeDelta: 0.02,
-                }}
-                showsUserLocation={true}
-            >
-                <Marker
-                    coordinate={{
+            (ride.origin_latitude && ride.origin_longitude && ride.destination_latitude && ride.destination_longitude) ? (
+                <MapView
+                    ref={mapRef}
+                    provider={PROVIDER_GOOGLE}
+                    style={{ flex: 1 }}
+                    mapPadding={{ top: 120, right: 20, bottom: 20, left: 20 }}
+                    initialRegion={{
                         latitude: ride.origin_latitude,
                         longitude: ride.origin_longitude,
+                        latitudeDelta: 0.02,
+                        longitudeDelta: 0.02,
                     }}
-                    title="Pickup"
-                    description={ride.origin_address}
-                    image={icons.point}
-                />
-                <Marker
-                    coordinate={{
-                        latitude: ride.destination_latitude,
-                        longitude: ride.destination_longitude,
-                    }}
-                    title="Destination"
-                    description={ride.destination_address}
-                    image={icons.to}
-                />
+                    showsUserLocation={true}
+                >
+                    <Marker
+                        coordinate={{
+                            latitude: ride.origin_latitude,
+                            longitude: ride.origin_longitude,
+                        }}
+                        title="Pickup"
+                        description={ride.origin_address}
+                        image={icons.point}
+                    />
+                    <Marker
+                        coordinate={{
+                            latitude: ride.destination_latitude,
+                            longitude: ride.destination_longitude,
+                        }}
+                        title="Destination"
+                        description={ride.destination_address}
+                        image={icons.to}
+                    />
 
-                <MapViewDirections
-                    origin={driverLocation ? {
-                        latitude: driverLocation.coords.latitude,
-                        longitude: driverLocation.coords.longitude,
-                    } : {
-                        latitude: ride.origin_latitude,
-                        longitude: ride.origin_longitude,
-                    }}
-                    destination={status === 'in_progress' ? {
-                        latitude: ride.destination_latitude,
-                        longitude: ride.destination_longitude,
-                    } : {
-                        latitude: ride.origin_latitude,
-                        longitude: ride.origin_longitude,
-                    }}
-                    apikey={process.env.EXPO_PUBLIC_DIRECTIONS_API_KEY!}
-                    strokeColor="#0286FF"
-                    strokeWidth={4}
-                />
-            </MapView>
+                    <MapViewDirections
+                        origin={driverLocation ? {
+                            latitude: driverLocation.coords.latitude,
+                            longitude: driverLocation.coords.longitude,
+                        } : {
+                            latitude: ride.origin_latitude,
+                            longitude: ride.origin_longitude,
+                        }}
+                        destination={status === 'in_progress' ? {
+                            latitude: ride.destination_latitude,
+                            longitude: ride.destination_longitude,
+                        } : {
+                            latitude: ride.origin_latitude,
+                            longitude: ride.origin_longitude,
+                        }}
+                        apikey={process.env.EXPO_PUBLIC_DIRECTIONS_API_KEY!}
+                        strokeColor="#0286FF"
+                        strokeWidth={4}
+                    />
+                </MapView>
+            ) : (
+                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#f3f4f6' }}>
+                    <ActivityIndicator size="large" color="#0286FF" />
+                    <Text style={{ marginTop: 10, fontSize: 14, color: '#6b7280' }}>Loading map...</Text>
+                </View>
+            )
         }>
             <View className="flex flex-col w-full items-center justify-center mt-5">
                 <Text className="text-xl font-JakartaBold mb-4 text-green-500">

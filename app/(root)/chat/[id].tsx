@@ -125,7 +125,7 @@ const ChatDetails = () => {
         <SafeAreaView className="flex-1 bg-white">
             {/* Header */}
             <View className="flex-row items-center p-4 border-b border-gray-200">
-                <TouchableOpacity onPress={() => router.back()} className="mr-4">
+                <TouchableOpacity onPress={() => router.push("/(root)/(tabs)/chat")} className="mr-4">
                     <Image source={icons.backArrow} className="w-6 h-6" resizeMode="contain" />
                 </TouchableOpacity>
                 <View className="flex-row items-center flex-1">
@@ -167,8 +167,8 @@ const ChatDetails = () => {
                         >
                             <View
                                 className={`max-w-[80%] p-3 rounded-2xl ${isOwnMessage
-                                        ? "bg-[#0286FF] rounded-tr-none"
-                                        : "bg-gray-100 rounded-tl-none"
+                                    ? "bg-[#0286FF] rounded-tr-none"
+                                    : "bg-gray-100 rounded-tl-none"
                                     }`}
                             >
                                 <Text
