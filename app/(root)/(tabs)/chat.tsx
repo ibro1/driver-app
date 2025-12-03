@@ -6,6 +6,7 @@ import { router, useFocusEffect } from "expo-router";
 import { useUser } from "@/lib/auth-context";
 import { icons, images } from "@/constants";
 import { useFetch } from "@/lib/fetch";
+import Avatar from "@/components/Avatar";
 
 interface Ride {
   ride_id: number;
@@ -73,21 +74,12 @@ const Chat = () => {
           className="flex-row items-center p-4 border-b border-gray-100 active:bg-gray-50"
           onPress={() => router.push(`/(root)/chat/${activeRide.ride_id}` as any)}
         >
-          <View className="w-12 h-12 bg-gray-200 rounded-full items-center justify-center mr-4">
-            {activeRide.rider?.image ? (
-              <Image
-                source={{ uri: activeRide.rider.image }}
-                className="w-12 h-12 rounded-full"
-                resizeMode="cover"
-              />
-            ) : (
-              <Image
-                source={icons.person}
-                className="w-6 h-6"
-                tintColor="#6B7280"
-                resizeMode="contain"
-              />
-            )}
+          <View className="mr-4">
+            <Avatar
+              source={activeRide.rider?.image}
+              name={activeRide.rider?.name || "Rider"}
+              size={12}
+            />
           </View>
           <View className="flex-1">
             <View className="flex-row justify-between items-center">
@@ -103,8 +95,8 @@ const Chat = () => {
             </Text>
           </View>
           <Image
-            source={icons.point}
-            className="w-5 h-5 -rotate-90"
+            source={icons.arrowUp}
+            className="w-5 h-5 rotate-90"
             tintColor="#D1D5DB"
             resizeMode="contain"
           />

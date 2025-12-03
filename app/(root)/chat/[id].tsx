@@ -8,6 +8,7 @@ import * as SecureStore from "expo-secure-store";
 import { useUser } from "@/lib/auth-context";
 import { icons } from "@/constants";
 import { useFetch } from "@/lib/fetch";
+import Avatar from "@/components/Avatar";
 
 interface Message {
     id: number;
@@ -125,21 +126,12 @@ const ChatDetails = () => {
                     <Image source={icons.backArrow} className="w-6 h-6" resizeMode="contain" />
                 </TouchableOpacity>
                 <View className="flex-row items-center flex-1">
-                    <View className="w-10 h-10 bg-gray-200 rounded-full items-center justify-center mr-3">
-                        {ride?.rider?.image ? (
-                            <Image
-                                source={{ uri: ride.rider.image }}
-                                className="w-10 h-10 rounded-full"
-                                resizeMode="cover"
-                            />
-                        ) : (
-                            <Image
-                                source={icons.profile}
-                                className="w-5 h-5"
-                                tintColor="#6B7280"
-                                resizeMode="contain"
-                            />
-                        )}
+                    <View className="mr-3">
+                        <Avatar
+                            source={ride?.rider?.image}
+                            name={ride?.rider?.name || "Rider"}
+                            size={10}
+                        />
                     </View>
                     <View>
                         <Text className="text-lg font-JakartaBold">{ride?.rider?.name || "Rider"}</Text>
