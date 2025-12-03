@@ -83,16 +83,10 @@ const ChatDetails = () => {
             content: inputText.trim(),
         };
 
+        const messageContent = inputText.trim();
+        setInputText("");
+
         try {
-            const tempMessage: Message = {
-                id: Date.now(),
-                senderId: user.id,
-                receiverId: ride.rider.id,
-                content: inputText.trim(),
-                createdAt: new Date().toISOString(),
-            };
-            setMessages((prev) => [...prev, tempMessage]);
-            setInputText("");
 
             const token = await SecureStore.getItemAsync("session_token");
             await fetch(`${process.env.EXPO_PUBLIC_API_URL}/api/chat/${id}`, {
@@ -111,6 +105,7 @@ const ChatDetails = () => {
 
         } catch (error) {
             console.error("Failed to send message:", error);
+            setInputText(messageContent);
         }
     };
 
@@ -157,7 +152,7 @@ const ChatDetails = () => {
             <FlatList
                 ref={flatListRef}
                 data={messages}
-                keyExtractor={(item) => item.id.toString()}
+                keyExtractor={(item, index) => item?.id?.toString() || `msg-${index}`}
                 className="flex-1 px-4"
                 contentContainerStyle={{ paddingVertical: 20 }}
                 renderItem={({ item }) => {
@@ -210,8 +205,8 @@ const ChatDetails = () => {
                         disabled={!inputText.trim()}
                     >
                         <Image
-                            source={icons.point}
-                            className="w-5 h-5"
+                            source={icons.arrowUp}
+                            className="w-5 h-5 rotate-45"
                             tintColor="white"
                             resizeMode="contain"
                         />

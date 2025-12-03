@@ -198,15 +198,15 @@ const RideScreen = () => {
                 </View>
 
                 <View className="w-full mb-5">
-                    <View className="flex-row items-center mb-4 border-b border-general-700 pb-3">
-                        <Image source={icons.to} className="w-6 h-6 mr-3" />
-                        <Text className="text-base font-JakartaMedium flex-1" numberOfLines={1}>
+                    <View className="flex-row items-center mb-3 border-b border-general-700 pb-2">
+                        <Image source={icons.to} className="w-5 h-5 mr-2" />
+                        <Text className="text-sm font-JakartaMedium flex-1" numberOfLines={1}>
                             {ride.origin_address}
                         </Text>
                     </View>
                     <View className="flex-row items-center">
-                        <Image source={icons.point} className="w-6 h-6 mr-3" />
-                        <Text className="text-base font-JakartaMedium flex-1" numberOfLines={1}>
+                        <Image source={icons.point} className="w-5 h-5 mr-2" />
+                        <Text className="text-sm font-JakartaMedium flex-1" numberOfLines={1}>
                             {ride.destination_address}
                         </Text>
                     </View>

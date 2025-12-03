@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
-import { View, Text, ScrollView, Alert } from "react-native";
+import { View, Text, ScrollView, Alert, Image, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
+import * as ImagePicker from "expo-image-picker";
 import InputField from "@/components/InputField";
 import CustomButton from "@/components/CustomButton";
 import { useFetch } from "@/lib/fetch";
 import Skeleton from "@/components/Skeleton";
+import { icons } from "@/constants";
 
 const EditVehicle = () => {
     const { data: profileData, loading: loadingData } = useFetch<any>("/api/driver/profile");
@@ -17,6 +19,7 @@ const EditVehicle = () => {
         color: "",
         plateNumber: "",
     });
+    const [carImage, setCarImage] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     useEffect(() => {
@@ -30,8 +33,29 @@ const EditVehicle = () => {
                 color: profileData.vehicle.color || "",
                 plateNumber: profileData.vehicle.plateNumber || "",
             });
+            setCarImage(profileData.vehicle.carImageUrl || null);
         }
     }, [profileData]);
+
+
+    const pickImage = async () => {
+        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        if (status !== "granted") {
+            Alert.alert("Permission Denied", "We need camera roll permissions to upload your car image");
+            return;
+        }
+
+        const result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsEditing: true,
+            aspect: [16, 9],
+            quality: 0.8,
+        });
+
+        if (!result.canceled && result.assets[0]) {
+            setCarImage(result.assets[0].uri);
+        }
+    };
 
     const handleUpdate = async () => {
         if (!form.make || !form.model || !form.year || !form.color || !form.plateNumber) {
@@ -42,6 +66,35 @@ const EditVehicle = () => {
         setIsSubmitting(true);
         try {
             const token = await import("expo-secure-store").then(s => s.getItemAsync("session_token"));
+
+            // Upload car image if changed
+            let carImageUrl = profileData?.vehicle?.carImageUrl;
+            if (carImage && carImage !== profileData?.vehicle?.carImageUrl) {
+                const formData = new FormData();
+                const filename = carImage.split('/').pop() || 'car.jpg';
+                const match = /\.(\w+)$/.exec(filename);
+                const type = match ? `image/${match[1]}` : 'image/jpeg';
+
+                formData.append('file', {
+                    uri: carImage,
+                    name: filename,
+                    type,
+                } as any);
+
+                const uploadResponse = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/api/upload`, {
+                    method: "POST",
+                    headers: {
+                        "Authorization": `Bearer ${token}`,
+                    },
+                    body: formData,
+                });
+
+                if (uploadResponse.ok) {
+                    const uploadResult = await uploadResponse.json();
+                    carImageUrl = uploadResult.url;
+                }
+            }
+
             const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/api/driver/vehicle`, {
                 method: "PATCH",
                 headers: {
@@ -51,6 +104,7 @@ const EditVehicle = () => {
                 body: JSON.stringify({
                     ...form,
                     year: parseInt(form.year),
+                    carImageUrl,
                 }),
             });
 
@@ -94,6 +148,31 @@ const EditVehicle = () => {
             <ScrollView className="px-5" contentContainerStyle={{ paddingBottom: 100 }}>
                 <Text className="text-2xl font-JakartaBold my-5">Edit Vehicle</Text>
 
+                {/* Car Image Upload */}
+                <View className="mb-5">
+                    <Text className="text-lg font-JakartaSemiBold mb-3">Car Image</Text>
+                    <TouchableOpacity
+                        onPress={pickImage}
+                        className="bg-general-600 rounded-2xl p-4 items-center justify-center border-2 border-dashed border-gray-300"
+                        style={{ height: 180 }}
+                        disabled={isSubmitting}
+                    >
+                        {carImage ? (
+                            <Image
+                                source={{ uri: carImage }}
+                                className="w-full h-full rounded-xl"
+                                resizeMode="contain"
+                            />
+                        ) : (
+                            <View className="items-center">
+                                <Image source={icons.point} className="w-12 h-12 mb-2" tintColor="#9CA3AF" />
+                                <Text className="text-gray-500 font-JakartaMedium">Tap to upload car image</Text>
+                                <Text className="text-gray-400 text-sm mt-1">Recommended: 16:9 aspect ratio</Text>
+                            </View>
+                        )}
+                    </TouchableOpacity>
+                </View>
+
                 <InputField
                     label="Make"
                     placeholder="e.g. Toyota"
@@ -135,11 +214,12 @@ const EditVehicle = () => {
                     editable={!isSubmitting}
                 />
 
+
                 <CustomButton
                     title="Save Changes"
                     onPress={handleUpdate}
                     className="mt-6"
-                    loading={isSubmitting}
+                    isLoading={isSubmitting}
                 />
             </ScrollView>
         </SafeAreaView>
