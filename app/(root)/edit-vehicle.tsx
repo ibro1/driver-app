@@ -3,6 +3,7 @@ import { View, Text, ScrollView, Alert, Image, TouchableOpacity } from "react-na
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
+import * as FileSystem from "expo-file-system";
 import InputField from "@/components/InputField";
 import CustomButton from "@/components/CustomButton";
 import { useFetch } from "@/lib/fetch";
@@ -70,27 +71,18 @@ const EditVehicle = () => {
             // Upload car image if changed
             let carImageUrl = profileData?.vehicle?.carImageUrl;
             if (carImage && carImage !== profileData?.vehicle?.carImageUrl) {
-                const formData = new FormData();
-                const filename = carImage.split('/').pop() || 'car.jpg';
-                const match = /\.(\w+)$/.exec(filename);
-                const type = match ? `image/${match[1]}` : 'image/jpeg';
-
-                formData.append('file', {
-                    uri: carImage,
-                    name: filename,
-                    type,
-                } as any);
-
-                const uploadResponse = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/api/upload`, {
-                    method: "POST",
+                const uploadUrl = `${process.env.EXPO_PUBLIC_API_URL}/api/upload`;
+                const uploadResponse = await FileSystem.uploadAsync(uploadUrl, carImage, {
+                    fieldName: "file",
+                    httpMethod: "POST",
+                    uploadType: FileSystem.FileSystemUploadType.MULTIPART,
                     headers: {
                         "Authorization": `Bearer ${token}`,
                     },
-                    body: formData,
                 });
 
-                if (uploadResponse.ok) {
-                    const uploadResult = await uploadResponse.json();
+                if (uploadResponse.status === 200) {
+                    const uploadResult = JSON.parse(uploadResponse.body);
                     carImageUrl = uploadResult.url;
                 }
             }

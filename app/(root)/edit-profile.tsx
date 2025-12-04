@@ -3,6 +3,7 @@ import { View, Text, ScrollView, Alert, TouchableOpacity, Image } from "react-na
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
+import * as FileSystem from "expo-file-system";
 import InputField from "@/components/InputField";
 import CustomButton from "@/components/CustomButton";
 import { useFetch } from "@/lib/fetch";
@@ -53,29 +54,23 @@ const EditProfile = () => {
         setUploading(true);
         try {
             const token = await import("expo-secure-store").then(s => s.getItemAsync("session_token"));
+            const uploadUrl = `${process.env.EXPO_PUBLIC_API_URL}/api/upload`;
 
-            const formData = new FormData();
-            formData.append("file", {
-                uri,
-                name: "profile.jpg",
-                type: "image/jpeg",
-            } as any);
-
-            const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/api/upload`, {
-                method: "POST",
+            const response = await FileSystem.uploadAsync(uploadUrl, uri, {
+                fieldName: "file",
+                httpMethod: "POST",
+                uploadType: FileSystem.FileSystemUploadType.MULTIPART,
                 headers: {
                     "Authorization": `Bearer ${token}`,
-                    "Content-Type": "multipart/form-data",
                 },
-                body: formData,
             });
 
-            const result = await response.json();
-
-            if (!response.ok) {
-                throw new Error(result.error || "Upload failed");
+            if (response.status !== 200) {
+                const errorData = JSON.parse(response.body);
+                throw new Error(errorData.error || "Upload failed");
             }
 
+            const result = JSON.parse(response.body);
             setForm(prev => ({ ...prev, profileImageUrl: result.url }));
         } catch (error: any) {
             Alert.alert("Error", "Failed to upload image: " + error.message);
