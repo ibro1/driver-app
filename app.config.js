@@ -2,27 +2,32 @@ import 'dotenv/config';
 
 export default {
     expo: {
-        name: "CarRide Driver",
-        slug: "carride-driver",
+        name: "KarRide Driver",
+        slug: "karride-driver",
+        owner: "netlinko",
         version: "1.0.0",
         orientation: "portrait",
-        icon: "./assets/images/icon.png",
-        scheme: "carride-driver",
+        icon: "./assets/icons/icon.png",
+        scheme: "karride-driver",
         userInterfaceStyle: "automatic",
         splash: {
-            image: "./assets/images/splash.png",
+            image: "./assets/icons/splash.png",
             resizeMode: "contain",
-            backgroundColor: "#2F80ED"
+            backgroundColor: "#020402"
         },
         ios: {
-            supportsTablet: true
+            supportsTablet: true,
+            icons: {
+                dark: "./assets/icons/ios-dark.png",
+                light: "./assets/icons/ios-dark.png"
+            }
         },
         android: {
             adaptiveIcon: {
-                foregroundImage: "./assets/images/adaptive-icon.png",
-                backgroundColor: "#ffffff"
+                foregroundImage: "./assets/icons/adaptive-icon.png",
+                backgroundColor: "#020402"
             },
-            package: "com.anonymous.carride.driver",
+            package: "ng.karride.driver",
             config: {
                 googleMaps: {
                     apiKey: process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY || "REPLACE_WITH_YOUR_GOOGLE_MAPS_API_KEY"
@@ -38,7 +43,7 @@ export default {
             [
                 "expo-router",
                 {
-                    "origin": "https://carride.ng/"
+                    "origin": "https://karride.ng/"
                 }
             ],
             [
@@ -57,12 +62,11 @@ export default {
         },
         extra: {
             router: {
-                "origin": "https://carride.ng/"
+                "origin": "https://karride.ng/"
             },
             eas: {
-                projectId: "f192321c-d635-4830-ba1b-8253d8a0ca01"
+                projectId: "bb5677ce-a44c-4a45-8071-ca1673c4a918"
             }
-        },
-        owner: "netlinko"
+        }
     }
 };

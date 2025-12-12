@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
-import { View, Text, ScrollView, Alert, TouchableOpacity, Image } from "react-native";
+import { View, Text, ScrollView, Alert, TouchableOpacity, Image, Platform } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
-import * as FileSystem from "expo-file-system";
+import * as SecureStore from "expo-secure-store";
 import InputField from "@/components/InputField";
 import CustomButton from "@/components/CustomButton";
 import { useFetch } from "@/lib/fetch";
@@ -53,24 +53,44 @@ const EditProfile = () => {
     const handleUpload = async (uri: string) => {
         setUploading(true);
         try {
-            const token = await import("expo-secure-store").then(s => s.getItemAsync("session_token"));
+            const token = await SecureStore.getItemAsync("session_token");
             const uploadUrl = `${process.env.EXPO_PUBLIC_API_URL}/api/upload`;
 
-            const response = await FileSystem.uploadAsync(uploadUrl, uri, {
-                fieldName: "file",
-                httpMethod: "POST",
-                uploadType: FileSystem.FileSystemUploadType.MULTIPART,
+            const formData = new FormData();
+            const filename = uri.split('/').pop() || 'profile.jpg';
+            const match = /\.(\w+)$/.exec(filename);
+            const type = match ? `image/${match[1]}` : 'image/jpeg';
+
+            formData.append('file', {
+                uri: Platform.OS === 'android' ? uri : uri.replace('file://', ''),
+                name: filename,
+                type: type,
+            } as any);
+
+            const response = await fetch(uploadUrl, {
+                method: "POST",
                 headers: {
                     "Authorization": `Bearer ${token}`,
+                    // Accept header is good practice
+                    "Accept": "application/json",
+                    // Content-Type must strictly be omitted
                 },
+                body: formData,
             });
 
-            if (response.status !== 200) {
-                const errorData = JSON.parse(response.body);
-                throw new Error(errorData.error || "Upload failed");
+            if (!response.ok) {
+                const errorText = await response.text();
+                let errorMessage = "Upload failed";
+                try {
+                    const errorJson = JSON.parse(errorText);
+                    errorMessage = errorJson.error || errorMessage;
+                } catch (e) {
+                    // ignore parse error logic
+                }
+                throw new Error(errorMessage);
             }
 
-            const result = JSON.parse(response.body);
+            const result = await response.json();
             setForm(prev => ({ ...prev, profileImageUrl: result.url }));
         } catch (error: any) {
             Alert.alert("Error", "Failed to upload image: " + error.message);
@@ -87,7 +107,7 @@ const EditProfile = () => {
 
         setIsSubmitting(true);
         try {
-            const token = await import("expo-secure-store").then(s => s.getItemAsync("session_token"));
+            const token = await SecureStore.getItemAsync("session_token");
             const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/api/driver/profile`, {
                 method: "PATCH",
                 headers: {
@@ -155,7 +175,7 @@ const EditProfile = () => {
                             disabled={uploading}
                             className="absolute bottom-0 right-0 bg-[#0286FF] p-2 rounded-full border-2 border-white"
                         >
-                            <Image source={icons.camera || icons.point} className="w-4 h-4" tintColor="white" resizeMode="contain" />
+                            <Image source={icons.point} className="w-4 h-4" tintColor="white" resizeMode="contain" />
                         </TouchableOpacity>
                     </View>
                     <Text className="text-sm font-JakartaMedium text-[#0286FF] mt-2">

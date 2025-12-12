@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
-import { View, Text, ScrollView, Alert, Image, TouchableOpacity } from "react-native";
+import { View, Text, ScrollView, Alert, Image, TouchableOpacity, Platform } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
-import * as FileSystem from "expo-file-system";
+import * as SecureStore from "expo-secure-store";
 import InputField from "@/components/InputField";
 import CustomButton from "@/components/CustomButton";
 import { useFetch } from "@/lib/fetch";
@@ -25,9 +25,7 @@ const EditVehicle = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     useEffect(() => {
-        console.log("EditVehicle: profileData changed", JSON.stringify(profileData, null, 2));
         if (profileData?.vehicle) {
-            console.log("EditVehicle: Setting form with", profileData.vehicle);
             setForm({
                 make: profileData.vehicle.make || "",
                 model: profileData.vehicle.model || "",
@@ -36,7 +34,7 @@ const EditVehicle = () => {
                 plateNumber: profileData.vehicle.plateNumber || "",
                 carSeats: profileData.vehicle.seats?.toString() || "",
             });
-            setCarImage(profileData.vehicle.carImageUrl || null);
+            setCarImage(profileData.vehicle.vehicleImageUrl || null);
         }
     }, [profileData]);
 
@@ -68,26 +66,63 @@ const EditVehicle = () => {
 
         setIsSubmitting(true);
         try {
-            const token = await import("expo-secure-store").then(s => s.getItemAsync("session_token"));
+            const token = await SecureStore.getItemAsync("session_token");
+
+            let finalCarImageUrl = profileData?.vehicle?.vehicleImageUrl;
 
             // Upload car image if changed
-            let carImageUrl = profileData?.vehicle?.carImageUrl;
-            if (carImage && carImage !== profileData?.vehicle?.carImageUrl) {
+            if (carImage && carImage !== profileData?.vehicle?.vehicleImageUrl) {
+                console.log("Starting image upload...");
                 const uploadUrl = `${process.env.EXPO_PUBLIC_API_URL}/api/upload`;
-                const uploadResponse = await FileSystem.uploadAsync(uploadUrl, carImage, {
-                    fieldName: "file",
-                    httpMethod: "POST",
-                    uploadType: FileSystem.FileSystemUploadType.MULTIPART,
+
+                // Prepare FormData
+                const formData = new FormData();
+                const filename = carImage.split('/').pop() || 'image.jpg';
+                const match = /\.(\w+)$/.exec(filename);
+                const type = match ? `image/${match[1]}` : 'image/jpeg';
+
+                formData.append('file', {
+                    uri: Platform.OS === 'android' ? carImage : carImage.replace('file://', ''),
+                    name: filename,
+                    type: type,
+                } as any);
+
+                // Use fetch for upload
+                const uploadResponse = await fetch(uploadUrl, {
+                    method: 'POST',
                     headers: {
-                        "Authorization": `Bearer ${token}`,
+                        'Authorization': `Bearer ${token}`,
+                        'Accept': 'application/json',
+                        // IMPORTANT: Do NOT set Content-Type header. 
+                        // The browser/runtime sets it automatically with the boundary for FormData.
                     },
+                    body: formData,
                 });
 
-                if (uploadResponse.status === 200) {
-                    const uploadResult = JSON.parse(uploadResponse.body);
-                    carImageUrl = uploadResult.url;
+                console.log("Upload status:", uploadResponse.status);
+
+                if (uploadResponse.ok) {
+                    const uploadResult = await uploadResponse.json();
+                    finalCarImageUrl = uploadResult.url;
+                    console.log("Image upload success:", finalCarImageUrl);
+                } else {
+                    const errorText = await uploadResponse.text();
+                    console.error("Upload failed response:", errorText);
+
+                    let errorMessage = "Image upload failed";
+                    try {
+                        const errorJson = JSON.parse(errorText);
+                        errorMessage = errorJson.error || errorMessage;
+                    } catch (e) {
+                        // failing to parse json, use text or default
+                        if (uploadResponse.status === 500) errorMessage = "Server error during upload";
+                    }
+
+                    throw new Error(errorMessage);
                 }
             }
+
+            console.log("Saving vehicle data:", { ...form, finalCarImageUrl });
 
             const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/api/driver/vehicle`, {
                 method: "PATCH",
@@ -99,7 +134,7 @@ const EditVehicle = () => {
                     ...form,
                     year: parseInt(form.year),
                     carSeats: parseInt(form.carSeats),
-                    carImageUrl,
+                    carImageUrl: finalCarImageUrl,
                 }),
             });
 
@@ -113,7 +148,8 @@ const EditVehicle = () => {
                 { text: "OK", onPress: () => router.back() }
             ]);
         } catch (error: any) {
-            Alert.alert("Error", error.message);
+            console.error("Update error:", error);
+            Alert.alert("Error", error.message || "An unexpected error occurred");
         } finally {
             setIsSubmitting(false);
         }
