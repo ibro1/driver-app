@@ -8,7 +8,7 @@ export default {
         version: "1.0.0",
         orientation: "portrait",
         icon: "./assets/icons/icon.png",
-        scheme: "karride-driver",
+        scheme: "ng.karride.driver",
         userInterfaceStyle: "automatic",
         splash: {
             image: "./assets/icons/splash-icon.png",
@@ -60,7 +60,8 @@ export default {
 
                     }
                 }
-            ]
+            ],
+            "expo-dev-client"
         ],
         experiments: {
             typedRoutes: true

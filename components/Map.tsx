@@ -81,6 +81,16 @@ const Map = ({ isOnline }: { isOnline?: boolean }) => {
     destinationLongitude,
   });
 
+  console.log("Map Debug:", {
+    region,
+    userLatitude,
+    userLongitude,
+    loading,
+    error,
+    driversCount: drivers?.length,
+    markersCount: markers.length
+  });
+
   if (loading || (!userLatitude && !userLongitude))
     return (
       <View className="flex-1 justify-center items-center w-full">
@@ -106,6 +116,8 @@ const Map = ({ isOnline }: { isOnline?: boolean }) => {
       showsUserLocation={true}
       userInterfaceStyle="light"
       mapPadding={{ top: 100, right: 20, bottom: 100, left: 20 }}
+      onMapReady={() => console.log("Map ready")}
+      onError={(e) => console.error("Map error:", e.nativeEvent)}
     >
       {markers.map((marker, index) => (
         <Marker

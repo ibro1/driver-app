@@ -8,6 +8,7 @@ export const fetchAPI = async (url: string, options?: RequestInit) => {
 
     // Get session token for authenticated requests
     const token = await SecureStore.getItemAsync("session_token");
+    console.log("fetchAPI: Token exists:", !!token);
 
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
@@ -27,13 +28,15 @@ export const fetchAPI = async (url: string, options?: RequestInit) => {
       headers["Authorization"] = `Bearer ${token}`;
     }
 
+    console.log("fetchAPI: Making request to", fullUrl);
     const response = await fetch(fullUrl, {
       ...options,
       headers,
     });
 
+    console.log("fetchAPI: Response status:", response.status);
     if (!response.ok) {
-      new Error(`HTTP error! status: ${response.status}`);
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
     return await response.json();
   } catch (error) {

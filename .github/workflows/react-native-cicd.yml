@@ -1,0 +1,173 @@
+# A clear name for your workflow
+name: React Native CI/CD (npm)
+
+# Defines when the workflow runs
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+  workflow_dispatch:
+    inputs:
+      buildType:
+        type: choice
+        description: 'Build type to run'
+        options:
+          - dev
+          - prod-apk
+          - prod-aab
+          - all
+
+# Environment variables available to all jobs
+env:
+  EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+  NODE_OPTIONS: --openssl-legacy-provider # This can stay as it's for Node.js compatibility
+
+# The collection of jobs to run
+jobs:
+  # First job: runs tests and linting
+  test:
+    # Logic for when this job should run
+    if: >
+      github.event_name == 'pull_request' ||
+      github.event_name == 'workflow_dispatch' ||
+      contains(github.event.head_commit.message, '[run')
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🏗 Checkout repository
+        uses: actions/checkout@v4
+      
+      # REMOVED: pnpm/action-setup step is no longer needed
+
+      - name: 🏗 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          # CHANGED: Use npm for caching, which looks for package-lock.json
+          cache: 'npm'
+      
+      - name: 📦 Install dependencies
+        # CHANGED: Use 'npm ci' which is the standard for CI environments. It's faster and safer.
+        run: npm ci
+      
+      # CHANGED: All script runners are now 'npm run'
+      - name: 🧪 Run TypeScript check
+        run: npm run tsc:check || true
+      - name: 🧹 Run ESLint
+        run: npm run lint || true
+      - name: 🎨 Run Prettier check
+        run: npm run lint:format || true
+
+  # Second job: builds the app files
+  build-and-deploy:
+    needs: test
+    # Logic for when this build job should run
+    if: >
+      needs.test.result == 'success' &&
+      (github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[run'))
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🏗 Checkout repository
+        uses: actions/checkout@v4
+
+      # REMOVED: pnpm/action-setup step is no longer needed
+      
+      - name: 🏗 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          # CHANGED: Use npm for caching
+          cache: 'npm'
+      
+      - name: 📦 Install dependencies and EAS CLI
+        # CHANGED: Use 'npm ci' and 'npm install -g'
+        run: |
+          npm ci
+          npm install -g eas-cli
+      
+      - name: 📱 Setup EAS build cache
+        uses: actions/cache@v3
+        with:
+          path: ~/.eas-build-local
+          # CHANGED: The cache key now depends on package-lock.json, not pnpm-lock.yaml
+          key: ${{ runner.os }}-eas-build-local-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-eas-build-local-
+            
+      - name: 🔄 Verify EAS CLI installation
+        run: |
+          echo "EAS CLI version:"
+          eas --version
+          
+      - name: 📋 Update metro.config.js for SVG support
+        # This step does not depend on the package manager, so it remains unchanged
+        run: |
+          if [ -f ./metro.config.js ]; then
+            echo "Creating backup of metro.config.js"
+            cp ./metro.config.js ./metro.config.js.backup
+            echo "Updating metro.config.js to CommonJS format"
+            cat > ./metro.config.js << 'EOFMARKER'
+          /* eslint-disable @typescript-eslint/no-var-requires */
+          const { getDefaultConfig } = require('expo/metro-config');
+          const config = getDefaultConfig(__dirname);
+          const { transformer, resolver } = config;
+          config.transformer = {
+            ...transformer,
+            babelTransformerPath: require.resolve('react-native-svg-transformer/expo'),
+          };
+          config.resolver = {
+            ...resolver,
+            assetExts: resolver.assetExts.filter(ext => ext !== 'svg'),
+            sourceExts: [...resolver.sourceExts, 'svg'],
+          };
+          module.exports = config;
+          EOFMARKER
+            echo "metro.config.js updated to CommonJS format"
+          else
+            echo "metro.config.js not found"
+          fi
+
+      # The actual build commands below do not need to change, as they call 'eas' directly.
+      - name: 📱 Build Development APK
+        if: >
+          github.event.inputs.buildType == 'all' ||
+          github.event.inputs.buildType == 'dev' ||
+          contains(github.event.head_commit.message, '[run development ci]') ||
+          contains(github.event.head_commit.message, '[run ci]')
+        run: |
+          export NODE_OPTIONS="--openssl-legacy-provider --max_old_space_size=4096"
+          eas build --platform android --profile development --local --non-interactive --output=./app-dev.apk
+        env:
+          NODE_ENV: development
+
+      - name: 📱 Build Production APK
+        if: >
+          github.event.inputs.buildType == 'all' ||
+          github.event.inputs.buildType == 'prod-apk' ||
+          contains(github.event.head_commit.message, '[run ci]')
+        run: |
+          export NODE_OPTIONS="--openssl-legacy-provider --max_old_space_size=4096"
+          eas build --platform android --profile preview --local --non-interactive --output=./app-prod.apk
+        env:
+          NODE_ENV: production
+
+      - name: 📱 Build Production AAB
+        if: >
+          github.event.inputs.buildType == 'all' ||
+          github.event.inputs.buildType == 'prod-aab' ||
+          contains(github.event.head_commit.message, '[run ci]')
+        run: |
+          export NODE_OPTIONS="--openssl-legacy-provider --max_old_space_size=4096"
+          eas build --platform android --profile production --local --non-interactive --output=./app-prod.aab
+        env:
+          NODE_ENV: production
+
+      - name: 📦 Upload build artifacts to GitHub
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-builds
+          path: |
+            ./app-dev.apk
+            ./app-prod.apk
+            ./app-prod.aab
+          retention-days: 7

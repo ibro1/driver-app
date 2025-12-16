@@ -113,7 +113,12 @@ const SwipeButton = ({
                         {loading ? (
                             <ActivityIndicator size="small" color={trackColor} />
                         ) : (
-                            <Image source={icons.point} className="w-6 h-6" resizeMode="contain" />
+                            <Image
+                                source={icons.backArrow}
+                                className="w-6 h-6"
+                                resizeMode="contain"
+                                style={{ transform: [{ rotate: "180deg" }] }}
+                            />
                             //   <Text style={{ color: trackColor, fontWeight: "bold" }}>{">"}</Text>
                         )}
                     </Animated.View>

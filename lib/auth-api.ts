@@ -178,13 +178,15 @@ export const signOutUser = async (): Promise<void> => {
  */
 export const getSession = async (): Promise<any> => {
     const token = await SecureStore.getItemAsync("session_token");
-    console.log("getSession: Token from SecureStore:", token ? "Exists" : "Null");
+    console.log("getSession: Token from SecureStore:", token ? `Exists (${token.substring(0, 10)}...)` : "Null");
 
     if (!token) {
+        console.log("getSession: No token found, returning null");
         return null;
     }
 
     try {
+        console.log("getSession: Fetching user data from", `${API_URL}/api/auth/me`);
         const response = await fetch(`${API_URL}/api/auth/me`, {
             method: "GET",
             headers: {
@@ -203,7 +205,9 @@ export const getSession = async (): Promise<any> => {
             return null;
         }
 
-        return await response.json();
+        const data = await response.json();
+        console.log("getSession: User data retrieved successfully");
+        return data;
     } catch (error) {
         console.error("Get session error:", error);
         return null;
@@ -227,8 +231,10 @@ export const registerDriver = async (
     vehicleSeats: number
 ): Promise<any> => {
     const token = await SecureStore.getItemAsync("session_token");
-    if (!token) throw new Error("Not authenticated");
+    console.log("registerDriver: Token exists:", !!token);
+    if (!token) throw new Error("Not authenticated. Please sign in again.");
 
+    console.log("registerDriver: Sending request to", `${API_URL}/api/driver/register`);
     const response = await fetch(`${API_URL}/api/driver/register`, {
         method: "POST",
         headers: {
@@ -250,9 +256,8 @@ export const registerDriver = async (
         }),
     });
 
+    console.log("registerDriver: Response status:", response.status);
     return await handleResponse(response, "Failed to register driver");
-
-
 };
 
 /**
@@ -260,6 +265,7 @@ export const registerDriver = async (
  */
 export const getDriverProfile = async (userId?: string): Promise<any> => {
     const token = await SecureStore.getItemAsync("session_token");
+    console.log("getDriverProfile: Token exists:", !!token);
     if (!token) return null;
 
     const response = await fetch(`${API_URL}/api/driver/status`, {
@@ -270,6 +276,7 @@ export const getDriverProfile = async (userId?: string): Promise<any> => {
         },
     });
 
+    console.log("getDriverProfile: Response status:", response.status);
     if (!response.ok) {
         return null;
     }
@@ -377,7 +384,8 @@ export const updateRideStatus = async (
  * Sign in with Google (OAuth)
  */
 export const signInWithGoogle = async (idToken: string): Promise<AuthResponse> => {
-    const response = await fetch(`${API_URL}/api/auth/callback/google`, {
+    console.log("signInWithGoogle: Sending request to", `${API_URL}/api/auth/mobile/google`);
+    const response = await fetch(`${API_URL}/api/auth/mobile/google`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -388,14 +396,18 @@ export const signInWithGoogle = async (idToken: string): Promise<AuthResponse> =
         }),
     });
 
+    console.log("signInWithGoogle: Response status:", response.status);
     const data = await handleResponse(response, "Google sign in failed");
-
-
+    console.log("signInWithGoogle: Response data:", data);
 
     // Store session token
     const token = data.session?.token || data.token;
     if (token) {
+        console.log("signInWithGoogle: Saving token to SecureStore");
         await SecureStore.setItemAsync("session_token", token);
+        console.log("signInWithGoogle: Token saved successfully");
+    } else {
+        console.error("signInWithGoogle: No token in response");
     }
 
     return data;

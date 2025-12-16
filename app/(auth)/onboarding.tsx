@@ -37,14 +37,13 @@ const Onboarding = () => {
                 form.lastName,
                 form.phone,
                 form.licenseNumber,
-                {
-                    make: form.vehicleMake,
-                    model: form.vehicleModel,
-                    year: form.vehicleYear,
-                    color: form.vehicleColor,
-                    plateNumber: form.plateNumber,
-                    seats: form.seats,
-                }
+                "standard",
+                form.vehicleMake,
+                form.vehicleModel,
+                parseInt(form.vehicleYear) || 2020,
+                form.vehicleColor,
+                form.plateNumber,
+                parseInt(form.seats) || 4
             );
             Alert.alert("Success", "You are now registered as a driver!");
             router.replace("/(root)/(tabs)/home");

@@ -14,37 +14,57 @@ WebBrowser.maybeCompleteAuthSession();
 const OAuth = () => {
   const { refreshSession } = useAuth();
 
+  console.log("OAuth Config:", {
+    androidClientId: process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID,
+    iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
+    webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
+    apiUrl: process.env.EXPO_PUBLIC_API_URL,
+  });
+
   const [request, response, promptAsync] = Google.useAuthRequest({
     androidClientId: process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID,
     iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
     webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
   });
 
+  console.log("OAuth Request:", request);
+
   useEffect(() => {
     handleGoogleSignInResponse();
   }, [response]);
 
   const handleGoogleSignInResponse = async () => {
+    console.log("OAuth Response:", response);
     if (response?.type === "success") {
-      const { authentication } = response;
+      const { authentication, params } = response;
+      console.log("Authentication:", authentication);
+      console.log("Params:", params);
 
       if (authentication?.idToken) {
         try {
+          console.log("Calling signInWithGoogle with idToken...");
           await signInWithGoogle(authentication.idToken);
+          console.log("Google sign in successful, refreshing session...");
           await refreshSession();
-          Alert.alert("Success", "You have successfully signed in with Google");
+          console.log("Session refreshed, navigating to home...");
           router.replace("/(root)/(tabs)/home");
         } catch (error: any) {
           console.error("Google sign in error:", error);
           Alert.alert("Error", error.message || "Google sign in failed");
         }
       }
+    } else if (response?.type === "error") {
+      console.error("OAuth Error:", response.error);
+      Alert.alert("OAuth Error", response.error?.message || "Authentication failed");
     }
   };
 
   const handleGoogleSignIn = async () => {
+    console.log("Google Sign In button clicked");
     try {
-      await promptAsync();
+      console.log("Calling promptAsync...");
+      const result = await promptAsync();
+      console.log("PromptAsync result:", result);
     } catch (error: any) {
       console.error("Google OAuth error:", error);
       Alert.alert("Error", "Failed to initiate Google sign in");
