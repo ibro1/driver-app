@@ -1,6 +1,6 @@
 import { useLocalSearchParams, router } from "expo-router";
 import { useEffect, useState, useRef } from "react";
-import { View, Text, ActivityIndicator, Image, Alert, TouchableOpacity } from "react-native";
+import { View, Text, ActivityIndicator, Image, Alert, TouchableOpacity, Linking } from "react-native";
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import MapViewDirections from "react-native-maps-directions";
 import * as Location from "expo-location";
@@ -190,25 +190,36 @@ const RideScreen = () => {
                         </View>
                     </View>
                     <View className="flex-row items-center ml-3 gap-3">
-                        <TouchableOpacity
-                            onPress={() => {
-                                Alert.alert(
-                                    "Emergency SOS",
-                                    "Are you sure you want to call emergency services?",
-                                    [
-                                        { text: "Cancel", style: "cancel" },
-                                        {
-                                            text: "Call 112",
-                                            style: "destructive",
-                                            onPress: () => Alert.alert("Calling 112...")
-                                        }
-                                    ]
-                                )
-                            }}
-                            className="bg-red-500 p-3 rounded-full justify-center items-center w-12 h-12"
-                        >
-                            <Text className="text-white font-bold text-xs">SOS</Text>
-                        </TouchableOpacity>
+                        {/* Status Guard: Only show SOS if in progress, else Call */}
+                        {status === 'in_progress' ? (
+                            <TouchableOpacity
+                                onPress={() => {
+                                    Alert.alert(
+                                        "Emergency SOS",
+                                        "Are you sure you want to call emergency services?",
+                                        [
+                                            { text: "Cancel", style: "cancel" },
+                                            {
+                                                text: "Call 112",
+                                                style: "destructive",
+                                                onPress: () => Alert.alert("Calling 112...")
+                                            }
+                                        ]
+                                    )
+                                }}
+                                className="bg-red-500 p-3 rounded-full justify-center items-center w-12 h-12"
+                            >
+                                <Text className="text-white font-bold text-xs">SOS</Text>
+                            </TouchableOpacity>
+                        ) : (
+                            <TouchableOpacity
+                                onPress={() => Linking.openURL(`tel:${ride.rider.phone_number}`)}
+                                className="bg-success-500 p-3 rounded-full justify-center items-center w-12 h-12"
+                            >
+                                <Image source={icons.phone} className="w-6 h-6" tintColor="white" resizeMode="contain" />
+                            </TouchableOpacity>
+                        )}
+
                         <TouchableOpacity
                             onPress={() => router.push(`/(root)/chat/${id}` as any)}
                             className="bg-accent-500 p-3 rounded-full justify-center items-center w-12 h-12"

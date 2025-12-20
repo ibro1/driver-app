@@ -59,7 +59,9 @@ declare interface Ride {
     name: string;
     email: string;
     image: string;
+    image: string;
     rating: string;
+    phone_number: string;
   };
 }
 
