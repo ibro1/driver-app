@@ -4,7 +4,7 @@ import { useAuth } from "@/lib/auth-context";
 import * as Location from "expo-location";
 import Map from "@/components/Map";
 import { icons } from "@/constants";
-import { updateDriverStatus, updateDriverLocation, getDriverProfile, acceptRide } from "@/lib/auth-api";
+import { updateDriverStatus, updateDriverLocation, getDriverProfile, acceptRide, updateRideStatus } from "@/lib/auth-api";
 import RideRequestSheet from "@/components/RideRequestSheet";
 import { router } from "expo-router";
 import { useFetch } from "@/lib/fetch";
@@ -167,8 +167,28 @@ const DriverHome = () => {
         }
     };
 
-    const handleDeclineRide = () => {
-        setRideRequest(null);
+    const [decliningRide, setDecliningRide] = useState(false);
+
+    const handleDeclineRide = async () => {
+        if (!rideRequest || !user) return;
+        setDecliningRide(true);
+        try {
+            // 1. Emit socket event for real-time update (Optimistic)
+            const socket = getSocket();
+            socket.emit("ride_rejected", {
+                rideId: rideRequest.rideId,
+            });
+
+            // 2. Call API to reject ride
+            await updateRideStatus(rideRequest.rideId, "rejected");
+
+            setRideRequest(null);
+        } catch (error) {
+            console.error("Error rejecting ride:", error);
+            Alert.alert("Error", "Failed to reject ride");
+        } finally {
+            setDecliningRide(false);
+        }
     };
 
     if (loading) {
@@ -231,6 +251,7 @@ const DriverHome = () => {
                 onAccept={handleAcceptRide}
                 onDecline={handleDeclineRide}
                 loading={acceptingRide}
+                declineLoading={decliningRide}
             />
         </View>
     );

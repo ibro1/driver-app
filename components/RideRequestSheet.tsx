@@ -19,9 +19,10 @@ interface RideRequestSheetProps {
     onAccept: () => void;
     onDecline: () => void;
     loading?: boolean;
+    declineLoading?: boolean;
 }
 
-const RideRequestSheet = ({ request, onAccept, onDecline, loading }: RideRequestSheetProps) => {
+const RideRequestSheet = ({ request, onAccept, onDecline, loading, declineLoading }: RideRequestSheetProps) => {
     const snapPoints = useMemo(() => ["50%"], []);
 
     if (!request) return null;
@@ -72,6 +73,7 @@ const RideRequestSheet = ({ request, onAccept, onDecline, loading }: RideRequest
                     <CustomButton
                         title="Decline"
                         onPress={onDecline}
+                        isLoading={declineLoading}
                         className="flex-1 bg-red-500 mr-3"
                     />
 

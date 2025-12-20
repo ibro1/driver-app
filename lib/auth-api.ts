@@ -10,6 +10,11 @@ interface AuthResponse {
     };
 }
 
+interface ErrorResponse {
+    message?: string;
+    error?: string;
+}
+
 const handleResponse = async (response: Response, defaultMessage: string) => {
     if (!response.ok) {
         if (response.status === 500) {
@@ -361,7 +366,7 @@ export const acceptRide = async (rideId: number): Promise<any> => {
  */
 export const updateRideStatus = async (
     rideId: number,
-    status: "arrived" | "in_progress" | "completed" | "cancelled"
+    status: "arrived" | "in_progress" | "completed" | "cancelled" | "rejected"
 ): Promise<any> => {
     const token = await SecureStore.getItemAsync("session_token");
     if (!token) throw new Error("Not authenticated");
