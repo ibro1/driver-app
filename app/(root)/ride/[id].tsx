@@ -211,7 +211,7 @@ const RideScreen = () => {
                         </TouchableOpacity>
                         <TouchableOpacity
                             onPress={() => router.push(`/(root)/chat/${id}` as any)}
-                            className="bg-primary-500 p-3 rounded-full justify-center items-center w-12 h-12"
+                            className="bg-accent-500 p-3 rounded-full justify-center items-center w-12 h-12"
                         >
                             <Image source={icons.chat} className="w-6 h-6" tintColor="white" resizeMode="contain" />
                         </TouchableOpacity>

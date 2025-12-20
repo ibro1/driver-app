@@ -1,5 +1,6 @@
 import { Tabs } from "expo-router";
 import { Image, ImageSourcePropType, View } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
 
 import { icons } from "@/constants";
 
@@ -16,12 +17,26 @@ const TabIcon = ({
     <View
       className={`rounded-full w-12 h-12 items-center justify-center ${focused ? "bg-general-400" : ""}`}
     >
-      <Image
-        source={source}
-        tintColor="white"
-        resizeMode="contain"
-        className="w-7 h-7"
-      />
+      {focused ? (
+        <LinearGradient
+          colors={["#9D00FF", "#5E0099"]}
+          className="rounded-full w-12 h-12 items-center justify-center"
+        >
+          <Image
+            source={source}
+            tintColor="white"
+            resizeMode="contain"
+            className="w-7 h-7"
+          />
+        </LinearGradient>
+      ) : (
+        <Image
+          source={source}
+          tintColor="white"
+          resizeMode="contain"
+          className="w-7 h-7"
+        />
+      )}
     </View>
   </View>
 );

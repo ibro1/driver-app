@@ -160,7 +160,7 @@ const SignUp = () => {
             className="text-lg text-center text-general-200 mt-10"
           >
             Already have an account?{" "}
-            <Text className="text-primary-500">Log In</Text>
+            <Text className="text-accent-500">Log In</Text>
           </Link>
         </View>
         <ReactNativeModal
