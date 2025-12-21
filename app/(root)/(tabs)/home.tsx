@@ -72,6 +72,28 @@ const DriverHome = () => {
                             setRideRequest(data);
                         });
 
+                        socket.on("ride_status_updated", (data: { rideId: number, status: string }) => {
+                            console.log("Driver App: Ride status updated", data);
+                            setRideRequest((prev: any) => {
+                                if (prev && prev.rideId === data.rideId && (data.status === 'cancelled' || data.status === 'rejected')) {
+                                    Alert.alert("Ride Cancelled", "The rider has cancelled the request.");
+                                    return null;
+                                }
+                                return prev;
+                            });
+                        });
+
+                        socket.on("ride_cancelled", (data: { rideId: number }) => {
+                            console.log("Driver App: Ride cancelled event", data);
+                            setRideRequest((prev: any) => {
+                                if (prev && prev.rideId === data.rideId) {
+                                    Alert.alert("Ride Cancelled", "The rider has cancelled the request.");
+                                    return null;
+                                }
+                                return prev;
+                            });
+                        });
+
                         // 3. Check for pending request
                         if (response.pendingRequest) {
                             setRideRequest(response.pendingRequest);
