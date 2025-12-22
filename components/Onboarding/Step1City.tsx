@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { View, Text, TouchableOpacity, ScrollView, Alert, ActivityIndicator } from "react-native";
 import * as Location from "expo-location";
-import { MapPin, Search } from "lucide-react-native";
+import { Feather } from "@expo/vector-icons";
 
 import CustomButton from "@/components/CustomButton";
 import InputField from "@/components/InputField";
@@ -75,7 +75,7 @@ const Step1City: React.FC<Step1Props> = ({ initialData, onNext, loading }) => {
                     <ActivityIndicator size="small" color="#0286FF" />
                 ) : (
                     <>
-                        <MapPin size={20} color="#0286FF" />
+                        <Feather name="map-pin" size={20} color="#0286FF" />
                         <Text className="text-primary-500 font-JakartaSemiBold ml-2">Use Current Location</Text>
                     </>
                 )}
@@ -91,7 +91,8 @@ const Step1City: React.FC<Step1Props> = ({ initialData, onNext, loading }) => {
                         setSearchText(text);
                         if (text === "") setCity("");
                     }}
-                    icon={Search}
+                    // Passing a wrapper component that renders the Feather Icon
+                    icon={() => <Feather name="search" size={20} color="#6b7280" />}
                 />
             </View>
 
