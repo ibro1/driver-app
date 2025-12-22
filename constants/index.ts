@@ -14,6 +14,7 @@ import lock from "@/assets/icons/lock.png";
 import map from "@/assets/icons/map.png";
 import marker from "@/assets/icons/marker.png";
 import out from "@/assets/icons/out.png";
+import calendar from "@/assets/icons/calendar.png";
 import person from "@/assets/icons/person.png";
 import pin from "@/assets/icons/pin.png";
 import point from "@/assets/icons/point.png";
@@ -49,6 +50,7 @@ export const images = {
 export const icons = {
   arrowDown,
   arrowUp,
+  calendar,
   backArrow,
   chat,
   checkmark,
