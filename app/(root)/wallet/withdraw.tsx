@@ -71,7 +71,7 @@ const Withdraw = () => {
                 <View className="mb-6">
                     <Text className="text-neutral-500 font-JakartaMedium mb-2">Available for Withdrawal</Text>
                     {loadingBalance ? (
-                        <ActivityIndicator size="small" color="#0286FF" />
+                        <View className="w-48 h-10 bg-neutral-200 rounded animate-pulse my-1" />
                     ) : (
                         <Text className="text-4xl font-JakartaBold text-neutral-800">
                             ₦{currentBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
@@ -90,7 +90,15 @@ const Withdraw = () => {
 
                 <Text className="text-neutral-500 font-JakartaMedium mb-3">To Bank Account</Text>
                 {loadingBanks ? (
-                    <ActivityIndicator color="#0286FF" />
+                    <View className="bg-white border border-neutral-200 rounded-xl p-4 flex-row items-center justify-between">
+                        <View className="flex-row items-center">
+                            <View className="w-12 h-12 bg-neutral-200 rounded-full mr-3 animate-pulse" />
+                            <View>
+                                <View className="w-32 h-6 bg-neutral-200 rounded mb-1 animate-pulse" />
+                                <View className="w-24 h-4 bg-neutral-200 rounded animate-pulse" />
+                            </View>
+                        </View>
+                    </View>
                 ) : defaultBank ? (
                     <View className="bg-white border border-neutral-200 rounded-xl p-4 flex-row items-center justify-between">
                         <View className="flex-row items-center">
