@@ -26,7 +26,7 @@ const Home = () => {
     <SafeAreaView className="flex-1 items-center justify-between bg-white">
       <TouchableOpacity
         onPress={() => {
-          router.replace("/(auth)/sign-up");
+          router.replace("/(auth)/sign-in");
         }}
         className="w-full flex justify-end items-end p-5"
       >
@@ -78,7 +78,7 @@ const Home = () => {
         title={isLastSlide ? "Get Started" : "Next"}
         onPress={() => {
           if (isLastSlide) {
-            router.replace("/(auth)/sign-up");
+            router.replace("/(auth)/sign-in");
           } else {
             flatListRef.current?.scrollToIndex({ index: activeIndex + 1 });
           }

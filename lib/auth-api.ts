@@ -18,7 +18,7 @@ interface ErrorResponse {
 const handleResponse = async (response: Response, defaultMessage: string) => {
     if (!response.ok) {
         if (response.status === 500) {
-            throw new Error("Internal Server Error. Please try again later.");
+            throw new Error("Something went wrong. Please try again later.");
         }
         try {
             const error: ErrorResponse = await response.json();
@@ -278,7 +278,6 @@ export const registerDriver = async (
             first_name: firstName,
             last_name: lastName,
             phone,
-            phone,
             license_number: licenseNumber,
             profile_image_url: profileImageUrl,
             vehicle_type: vehicleType,
@@ -418,6 +417,9 @@ export const updateRideStatus = async (
 /**
  * Sign in with Google (OAuth)
  */
+/**
+ * Sign in with Google (OAuth)
+ */
 export const signInWithGoogle = async (idToken: string): Promise<AuthResponse> => {
     console.log("signInWithGoogle: Sending request to", `${API_URL}/api/auth/mobile/google`);
     const response = await fetch(`${API_URL}/api/auth/mobile/google`, {
@@ -443,6 +445,46 @@ export const signInWithGoogle = async (idToken: string): Promise<AuthResponse> =
         console.log("signInWithGoogle: Token saved successfully");
     } else {
         console.error("signInWithGoogle: No token in response");
+    }
+
+    return data;
+};
+
+/**
+ * Send OTP for phone authentication
+ */
+export const sendOtp = async (phone: string): Promise<any> => {
+    const response = await fetch(`${API_URL}/api/auth/otp/send`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Origin": "myapp://",
+        },
+        body: JSON.stringify({ phone }),
+    });
+
+    return await handleResponse(response, "Failed to send OTP");
+};
+
+/**
+ * Verify OTP
+ */
+export const verifyOtp = async (phone: string, code: string): Promise<any> => {
+    const response = await fetch(`${API_URL}/api/auth/otp/verify`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Origin": "myapp://",
+        },
+        body: JSON.stringify({ phone, code }),
+    });
+
+    const data = await handleResponse(response, "Failed to verify OTP");
+
+    // Store session token if provided
+    const token = data.session?.token || data.token;
+    if (token) {
+        await SecureStore.setItemAsync("session_token", token);
     }
 
     return data;

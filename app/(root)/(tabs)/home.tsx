@@ -26,6 +26,8 @@ const DriverHome = () => {
     const [isMenuVisible, setMenuVisible] = useState(false);
     const [isTogglingStatus, setIsTogglingStatus] = useState(false);
 
+    const [verificationStatus, setVerificationStatus] = useState("pending");
+
     const { data: earningsData, refetch: refetchEarnings } = useFetch<any>(`/api/driver/${user?.id}/earnings`);
 
     useEffect(() => {
@@ -58,6 +60,7 @@ const DriverHome = () => {
 
                     if (response && response.driver) {
                         const driverId = response.driver.id;
+                        setVerificationStatus(response.driver.verificationStatus || "pending");
 
                         // 1. Set online status
                         if (response.driver.status === 'online' || response.driver.status === 'busy') {
@@ -153,6 +156,12 @@ const DriverHome = () => {
             Alert.alert("Error", "Location not available");
             return;
         }
+
+        if (verificationStatus !== "verified") {
+            Alert.alert("Account Restricted", "Your account is under review. You cannot go online until verified.");
+            return;
+        }
+
         setIsTogglingStatus(true);
         try {
             const newStatus = isOnline ? "offline" : "online";
@@ -227,33 +236,45 @@ const DriverHome = () => {
             <SideMenu isVisible={isMenuVisible} onClose={() => setMenuVisible(false)} />
 
             {/* Header */}
-            <View className="absolute top-14 left-0 right-0 z-10 flex-row justify-between items-center px-5 pointer-events-none">
-                {/* Hamburger Menu */}
-                <TouchableOpacity
-                    onPress={() => setMenuVisible(true)}
-                    className="bg-white p-3 rounded-full shadow-md pointer-events-auto"
-                >
-                    <Image source={icons.list} className="w-6 h-6" resizeMode="contain" tintColor="black" />
-                </TouchableOpacity>
+            <View className="absolute top-14 left-0 right-0 z-10 flex-col px-5 pointer-events-none">
+                <View className="flex-row justify-between items-center w-full">
+                    {/* Hamburger Menu */}
+                    <TouchableOpacity
+                        onPress={() => setMenuVisible(true)}
+                        className="bg-white p-3 rounded-full shadow-md pointer-events-auto"
+                    >
+                        <Image source={icons.list} className="w-6 h-6" resizeMode="contain" tintColor="black" />
+                    </TouchableOpacity>
 
-                {/* Online Toggle (Centered Button) */}
-                <TouchableOpacity
-                    onPress={toggleOnlineStatus}
-                    disabled={isTogglingStatus}
-                    className={`flex-row items-center justify-center rounded-full px-6 py-3 shadow-md pointer-events-auto ${isOnline ? "bg-green-500" : "bg-orange-500"} ${isTogglingStatus ? "opacity-70" : ""}`}
-                >
-                    {isTogglingStatus ? (
-                        <ActivityIndicator size="small" color="#fff" className="mr-2" />
-                    ) : (
-                        <View className="w-2 h-2 rounded-full bg-white mr-2" />
-                    )}
-                    <Text className="text-white font-JakartaBold text-sm">
-                        {isTogglingStatus ? "Updating..." : (isOnline ? "Go Offline" : "Go Online")}
-                    </Text>
-                </TouchableOpacity>
+                    {/* Online Toggle (Centered Button) */}
+                    <TouchableOpacity
+                        onPress={toggleOnlineStatus}
+                        disabled={isTogglingStatus}
+                        className={`flex-row items-center justify-center rounded-full px-6 py-3 shadow-md pointer-events-auto ${isOnline ? "bg-green-500" : (verificationStatus === "verified" ? "bg-orange-500" : "bg-gray-400")} ${isTogglingStatus ? "opacity-70" : ""}`}
+                    >
+                        {isTogglingStatus ? (
+                            <ActivityIndicator size="small" color="#fff" className="mr-2" />
+                        ) : (
+                            <View className="w-2 h-2 rounded-full bg-white mr-2" />
+                        )}
+                        <Text className="text-white font-JakartaBold text-sm">
+                            {isTogglingStatus ? "Updating..." : (isOnline ? "Go Offline" : "Go Online")}
+                        </Text>
+                    </TouchableOpacity>
 
-                {/* Empty View for Balance */}
-                <View className="w-12" />
+                    {/* Empty View for Balance */}
+                    <View className="w-12" />
+                </View>
+
+                {/* Verification Warning Banner */}
+                {verificationStatus !== "verified" && (
+                    <View className="mt-4 bg-red-500 p-3 rounded-xl shadow-lg pointer-events-auto">
+                        <Text className="text-white font-JakartaBold text-center">Account Under Review</Text>
+                        <Text className="text-white text-xs text-center mt-1">
+                            {verificationStatus === "rejected" ? "Your documents were rejected. Please update them." : "We are verifying your documents. You cannot go online yet."}
+                        </Text>
+                    </View>
+                )}
             </View>
 
             {/* Map Section */}

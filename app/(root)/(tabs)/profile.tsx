@@ -8,7 +8,7 @@ import { useFetch } from "@/lib/fetch";
 import Skeleton from "@/components/Skeleton";
 
 const Profile = () => {
-  const { user, logout } = useUser();
+  const { user, signOut } = useUser();
   const { data: profileData, loading, error } = useFetch<any>("/api/driver/profile");
 
   const handleLogout = async () => {
@@ -18,7 +18,7 @@ const Profile = () => {
         text: "Log Out",
         style: "destructive",
         onPress: async () => {
-          await logout();
+          await signOut();
           router.replace("/(auth)/sign-in");
         },
       },

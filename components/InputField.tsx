@@ -14,6 +14,8 @@ import { InputFieldProps } from "@/types/type";
 const InputField = ({
   label,
   icon,
+  // @ts-ignore
+  prefix,
   secureTextEntry = false,
   labelStyle,
   containerStyle,
@@ -21,7 +23,7 @@ const InputField = ({
   iconStyle,
   className,
   ...props
-}: InputFieldProps) => {
+}: InputFieldProps & { prefix?: React.ReactNode }) => {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -36,6 +38,9 @@ const InputField = ({
           >
             {icon && (
               <Image source={icon} className={`w-6 h-6 ml-4 ${iconStyle}`} />
+            )}
+            {prefix && (
+              <View className="ml-4">{prefix}</View>
             )}
             <TextInput
               className={`rounded-full p-4 font-JakartaSemiBold text-[15px] flex-1 ${inputStyle} text-left`}

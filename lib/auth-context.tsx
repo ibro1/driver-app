@@ -7,6 +7,8 @@ import {
     getSession as getSessionAPI,
     verifyEmail as verifyEmailAPI,
     sendVerificationCode as sendVerificationCodeAPI,
+    sendOtp as sendOtpAPI,
+    verifyOtp as verifyOtpAPI,
 } from "./auth-api";
 
 interface User {
@@ -17,6 +19,7 @@ interface User {
     image?: string;
     role?: string;
     gender?: boolean;
+    phone?: string;
 }
 
 interface AuthContextType {
@@ -36,6 +39,8 @@ interface AuthContextType {
     verifyEmail: (email: string, code: string) => Promise<void>;
     sendVerificationCode: (email: string) => Promise<void>;
     refreshSession: () => Promise<void>;
+    sendOtp: (phone: string) => Promise<void>;
+    verifyOtp: (phone: string, code: string) => Promise<any>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -131,6 +136,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         }
     };
 
+    const sendOtp = async (phone: string) => {
+        try {
+            await sendOtpAPI(phone);
+        } catch (error) {
+            throw error;
+        }
+    };
+
+    const verifyOtp = async (phone: string, code: string) => {
+        try {
+            const response = await verifyOtpAPI(phone, code);
+            setUser(response.session?.user || response.user);
+            return response;
+        } catch (error) {
+            throw error;
+        }
+    };
+
     const value: AuthContextType = {
         user,
         isLoaded,
@@ -141,6 +164,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         verifyEmail,
         sendVerificationCode,
         refreshSession,
+        sendOtp,
+        verifyOtp,
     };
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

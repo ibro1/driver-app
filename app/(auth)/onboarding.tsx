@@ -1,75 +1,50 @@
-import { useState } from "react";
-import { Alert, Text, View, Image, TouchableOpacity } from "react-native";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import { router } from "expo-router";
-import * as ImagePicker from "expo-image-picker";
+import { useState, useEffect } from "react";
+import { Alert, View, Text, ActivityIndicator } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { router } from "expo-router";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
-import CustomButton from "@/components/CustomButton";
-import InputField from "@/components/InputField";
-import { registerDriver, uploadFile } from "@/lib/auth-api";
 import { useUser } from "@/lib/auth-context";
-import { icons } from "@/constants";
+import { getOnboardingStatus, saveStep1city, saveStep2Profile, saveStep3Vehicle, completeOnboarding } from "@/lib/onboarding-api";
+import Step1City from "@/components/Onboarding/Step1City";
+import Step2Profile from "@/components/Onboarding/Step2Profile";
+import Step3Vehicle from "@/components/Onboarding/Step3Vehicle";
 
 const Onboarding = () => {
     const { user } = useUser();
-    const [form, setForm] = useState({
-        firstName: user?.name?.split(" ")[0] || "",
-        lastName: user?.name?.split(" ")[1] || "",
-        phone: "",
-        licenseNumber: "",
-        vehicleMake: "",
-        vehicleModel: "",
-        vehicleYear: "",
-        vehicleColor: "",
-        plateNumber: "",
-        seats: "4",
-    });
-    const [image, setImage] = useState<string | null>(null);
-    const [loading, setLoading] = useState(false);
+    const [step, setStep] = useState(0); // 0 = loading
+    const [data, setData] = useState<any>({});
+    const [loading, setLoading] = useState(true);
 
-    const pickImage = async () => {
-        const result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.Images,
-            allowsEditing: true,
-            aspect: [1, 1],
-            quality: 0.5,
-        });
+    useEffect(() => {
+        fetchStatus();
+    }, []);
 
-        if (!result.canceled) {
-            setImage(result.assets[0].uri);
+    const fetchStatus = async () => {
+        try {
+            const res = await getOnboardingStatus();
+            if (res.driver) {
+                setData(res.driver); // Assuming driver object matches what steps expect roughly
+                setStep(res.onboardingStep || 1);
+            } else {
+                setStep(1);
+            }
+        } catch (error) {
+            console.error(error);
+            Alert.alert("Error", "Failed to load progress");
+        } finally {
+            setLoading(false);
         }
     };
 
-    const onRegisterPress = async () => {
-        if (!form.licenseNumber || !form.vehicleMake || !form.vehicleModel || !form.plateNumber) {
-            Alert.alert("Error", "Please fill in all required fields");
-            return;
-        }
-
+    const handleStep1 = async (stepData: any) => {
         setLoading(true);
         try {
-            let profileImageUrl = null;
-            if (image) {
-                profileImageUrl = await uploadFile(image);
+            const res = await saveStep1city(stepData.city);
+            if (res.success) {
+                setData({ ...data, ...stepData });
+                setStep(2);
             }
-
-            await registerDriver(
-                form.firstName,
-                form.lastName,
-                form.phone,
-                form.licenseNumber,
-                profileImageUrl,
-                "standard",
-                form.vehicleMake,
-                form.vehicleModel,
-                parseInt(form.vehicleYear) || 2020,
-                form.vehicleColor,
-                form.plateNumber,
-                parseInt(form.seats) || 4
-            );
-            Alert.alert("Success", "You are now registered as a driver!");
-            router.replace("/(root)/(tabs)/home");
         } catch (error: any) {
             Alert.alert("Error", error.message);
         } finally {
@@ -77,98 +52,86 @@ const Onboarding = () => {
         }
     };
 
+    const handleStep2 = async (stepData: any) => {
+        setLoading(true);
+        try {
+            const res = await saveStep2Profile(stepData);
+            if (res.success) {
+                setData({ ...data, ...stepData });
+                setStep(3);
+            }
+        } catch (error: any) {
+            Alert.alert("Error", error.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleStep3 = async (stepData: any) => {
+        setLoading(true);
+        try {
+            const res = await saveStep3Vehicle(stepData);
+            if (res.success) {
+                // Finalize
+                await completeOnboarding();
+                Alert.alert("Success", "Application submitted for review!");
+                router.replace("/(root)/(tabs)/home");
+            }
+        } catch (error: any) {
+            Alert.alert("Error", error.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    if (loading && step === 0) {
+        return (
+            <View className="flex-1 justify-center items-center bg-white">
+                <ActivityIndicator size="large" color="#0286FF" />
+            </View>
+        );
+    }
+
     return (
         <SafeAreaView className="flex-1 bg-white">
-            <KeyboardAwareScrollView
-                className="flex-1 px-5"
-                enableOnAndroid={true}
-                extraScrollHeight={100}
-                enableAutomaticScroll={true}
-                contentContainerStyle={{ paddingBottom: 50 }}
-                keyboardShouldPersistTaps="handled"
-            >
-            >
-                <Text className="text-2xl font-JakartaBold mb-5 mt-5">Driver Registration</Text>
+            {/* Progress Bar (Simple) */}
+            <View className="flex-row h-1 bg-neutral-100 mx-5 mt-2 mb-5">
+                <View className={`h-full bg-primary-500 ${step >= 1 ? "w-1/3" : "w-0"}`} />
+                <View className={`h-full bg-primary-500 ${step >= 2 ? "w-1/3" : "w-0"}`} />
+                <View className={`h-full bg-primary-500 ${step >= 3 ? "w-1/3" : "w-0"}`} />
+            </View>
 
-                <View className="items-center justify-center mb-5">
-                    <TouchableOpacity onPress={pickImage} className="w-[100px] h-[100px] rounded-full bg-gray-100 items-center justify-center overflow-hidden border border-neutral-100">
-                        {image ? (
-                            <Image source={{ uri: image }} className="w-full h-full" resizeMode="cover" />
-                        ) : (
-                            <View className="items-center justify-center w-full h-full">
-                                <Image source={icons.person} className="w-10 h-10 tint-gray-400" resizeMode="contain" />
-                                <Text className="text-xs text-gray-400 mt-1">Upload</Text>
-                            </View>
-                        )}
-                    </TouchableOpacity>
-                </View>
-
-                <Text className="text-lg font-JakartaSemiBold mb-3">Personal Info</Text>
-                <InputField
-                    label="First Name"
-                    placeholder="Enter first name"
-                    value={form.firstName}
-                    onChangeText={(value) => setForm({ ...form, firstName: value })}
-                />
-                <InputField
-                    label="Last Name"
-                    placeholder="Enter last name"
-                    value={form.lastName}
-                    onChangeText={(value) => setForm({ ...form, lastName: value })}
-                />
-                <InputField
-                    label="Phone Number"
-                    placeholder="Enter phone number"
-                    value={form.phone}
-                    onChangeText={(value) => setForm({ ...form, phone: value })}
-                    keyboardType="phone-pad"
-                />
-                <InputField
-                    label="License Number"
-                    placeholder="Enter license number"
-                    value={form.licenseNumber}
-                    onChangeText={(value) => setForm({ ...form, licenseNumber: value })}
-                />
-
-                <Text className="text-lg font-JakartaSemiBold mb-3 mt-5">Vehicle Info</Text>
-                <InputField
-                    label="Vehicle Make"
-                    placeholder="e.g. Toyota"
-                    value={form.vehicleMake}
-                    onChangeText={(value) => setForm({ ...form, vehicleMake: value })}
-                />
-                <InputField
-                    label="Vehicle Model"
-                    placeholder="e.g. Camry"
-                    value={form.vehicleModel}
-                    onChangeText={(value) => setForm({ ...form, vehicleModel: value })}
-                />
-                <InputField
-                    label="Vehicle Year"
-                    placeholder="e.g. 2020"
-                    value={form.vehicleYear}
-                    onChangeText={(value) => setForm({ ...form, vehicleYear: value })}
-                    keyboardType="numeric"
-                />
-                <InputField
-                    label="Vehicle Color"
-                    placeholder="e.g. Silver"
-                    value={form.vehicleColor}
-                    onChangeText={(value) => setForm({ ...form, vehicleColor: value })}
-                />
-                <InputField
-                    label="Plate Number"
-                    placeholder="Enter plate number"
-                    value={form.plateNumber}
-                    onChangeText={(value) => setForm({ ...form, plateNumber: value })}
-                />
-
-                <CustomButton
-                    title={loading ? "Registering..." : "Complete Registration"}
-                    onPress={onRegisterPress}
-                    className="mt-10 mb-10"
-                    disabled={loading}
-                />
+            <KeyboardAwareScrollView className="flex-1 px-5" contentContainerStyle={{ paddingBottom: 50 }}>
+                {step === 1 && (
+                    <Step1City
+                        initialData={data}
+                        onNext={handleStep1}
+                        loading={loading}
+                    />
+                )}
+                {step === 2 && (
+                    <Step2Profile
+                        initialData={data}
+                        onNext={handleStep2}
+                        onBack={() => setStep(1)}
+                        loading={loading}
+                    />
+                )}
+                {step === 3 && (
+                    <Step3Vehicle
+                        initialData={data}
+                        onNext={handleStep3}
+                        onBack={() => setStep(2)}
+                        loading={loading}
+                    />
+                )}
+                {step > 3 && (
+                    <View className="flex-1 justify-center items-center mt-20">
+                        <Text className="text-xl font-JakartaBold">Application Under Review</Text>
+                        <Text className="text-gray-500 mt-2 text-center">Your application is currently being reviewed by our team.</Text>
+                        <Text className="text-primary-500 mt-5" onPress={() => router.replace("/(root)/(tabs)/home")}>Go to Dashboard</Text>
+                    </View>
+                )}
             </KeyboardAwareScrollView>
         </SafeAreaView>
     );
