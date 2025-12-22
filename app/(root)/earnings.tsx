@@ -53,12 +53,25 @@ const Earnings = () => {
                   </View>
                 </View>
 
-                <TouchableOpacity
-                  onPress={() => router.push("/(root)/wallet/add-bank")}
-                  className="bg-white py-3 rounded-full items-center"
-                >
-                  <Text className="text-[#0286FF] font-JakartaBold">Manage Payout Methods</Text>
-                </TouchableOpacity>
+                <View className="flex-row gap-3">
+                  <TouchableOpacity
+                    onPress={() => router.push("/(root)/wallet/withdraw" as any)}
+                    className="flex-1 bg-white py-3 rounded-full items-center"
+                  >
+                    <Text className="text-[#0286FF] font-JakartaBold">Cash Out</Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    onPress={() => router.push("/(root)/wallet/add-bank")}
+                    className="flex-1 bg-[#024482] py-3 rounded-full items-center"
+                  >
+                    <Text className="text-white font-JakartaBold">Bank Info</Text>
+                  </TouchableOpacity>
+                </View>
+
+                <Text className="text-white/60 text-xs text-center mt-3 font-JakartaMedium">
+                  Next Automatic Payout: Tuesday, Dec 23
+                </Text>
               </View>
 
               <Text className="text-lg font-JakartaBold text-neutral-800 mb-4">Recent Transactions</Text>

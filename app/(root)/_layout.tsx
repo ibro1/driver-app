@@ -13,6 +13,8 @@ const Layout = () => {
       <Stack.Screen name="support/chat/[id]" options={{ headerShown: false }} />
 
       <Stack.Screen name="wallet/add-bank" options={{ headerShown: false }} />
+      <Stack.Screen name="wallet/withdraw" options={{ headerShown: false }} />
+      <Stack.Screen name="wallet/history" options={{ headerShown: false }} />
     </Stack>
   );
 };
