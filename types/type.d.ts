@@ -37,6 +37,8 @@ declare interface MapProps {
 }
 
 declare interface Ride {
+  ride_id: number;
+  ride_distance: number;
   origin_address: string;
   destination_address: string;
   origin_latitude: number;

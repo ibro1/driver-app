@@ -1,4 +1,5 @@
-import { Image, Text, View } from "react-native";
+import { Image, Text, View, TouchableOpacity } from "react-native";
+import { router } from "expo-router";
 
 import { icons } from "@/constants";
 import { formatDate, formatTime } from "@/lib/utils";
@@ -6,7 +7,10 @@ import { Ride } from "@/types/type";
 
 const RideCard = ({ ride }: { ride: Ride }) => {
   return (
-    <View className="flex flex-col items-center justify-center bg-white rounded-lg shadow-sm shadow-neutral-300 mb-3 p-3">
+    <TouchableOpacity
+      onPress={() => router.push(`/(root)/ride-history/${ride.ride_id}` as any)}
+      className="flex flex-col items-center justify-center bg-white rounded-lg shadow-sm shadow-neutral-300 mb-3 p-3"
+    >
       {/* 1. Header: Date & Status */}
       <View className="flex flex-row items-center justify-between w-full mb-3">
         <View className="flex flex-row items-center gap-1">
@@ -87,7 +91,7 @@ const RideCard = ({ ride }: { ride: Ride }) => {
           )}
         </View>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
 

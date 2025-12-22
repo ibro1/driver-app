@@ -1,0 +1,125 @@
+import { useLocalSearchParams, router } from "expo-router";
+import { View, Text, Image, ScrollView, TouchableOpacity, Alert, ActivityIndicator } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { icons, images } from "@/constants";
+import { useFetch } from "@/lib/fetch";
+import { Ride } from "@/types/type";
+import { formatDate, formatTime } from "@/lib/utils";
+
+const DriverRideHistoryDetails = () => {
+    const { id } = useLocalSearchParams();
+    const { data: ride, loading, error } = useFetch<Ride>(`/api/rides/${id}`);
+
+    if (loading || !ride) {
+        return (
+            <SafeAreaView className="flex-1 bg-white justify-center items-center">
+                <ActivityIndicator size="large" color="#0286FF" />
+            </SafeAreaView>
+        );
+    }
+
+    return (
+        <SafeAreaView className="flex-1 bg-white">
+            <ScrollView className="px-5">
+                {/* Header */}
+                <View className="flex-row items-center justify-between my-5">
+                    <Text className="text-2xl font-JakartaBold">Trip Details</Text>
+                    <TouchableOpacity onPress={() => router.back()} className="w-10 h-10 bg-gray-100 rounded-full justify-center items-center">
+                        <Image source={icons.backArrow} className="w-6 h-6" resizeMode="contain" />
+                    </TouchableOpacity>
+                </View>
+
+                {/* Map Snapshot */}
+                <View className="w-full h-[200px] rounded-2xl overflow-hidden mb-5 shadow-sm shadow-neutral-300">
+                    <Image
+                        source={{
+                            uri: `https://maps.googleapis.com/maps/api/staticmap?center=${ride.destination_latitude},${ride.destination_longitude}&zoom=13&size=600x400&markers=color:green|${ride.origin_latitude},${ride.origin_longitude}&markers=color:red|${ride.destination_latitude},${ride.destination_longitude}&path=color:0x0000ff|weight:5|${ride.origin_latitude},${ride.origin_longitude}|${ride.destination_latitude},${ride.destination_longitude}&key=${process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY}`,
+                        }}
+                        className="w-full h-full"
+                        resizeMode="cover"
+                    />
+                </View>
+
+                {/* Ride Info Card */}
+                <View className="bg-white rounded-xl shadow-sm shadow-neutral-300 p-4 border border-gray-100 mb-5">
+                    <View className="flex-row items-center justify-between mb-4">
+                        <View className="flex-row items-center gap-2">
+                            <Image source={icons.calendar} className="w-5 h-5 text-gray-500" />
+                            <Text className="text-md font-JakartaBold">{formatDate(ride.created_at)}</Text>
+                        </View>
+                        <View className={`px-3 py-1 rounded-full ${ride.payment_status === 'paid' ? 'bg-green-100' : 'bg-red-100'}`}>
+                            <Text className={`text-xs capitalize font-JakartaBold ${ride.payment_status === 'paid' ? 'text-green-700' : 'text-red-700'}`}>
+                                {ride.payment_status}
+                            </Text>
+                        </View>
+                    </View>
+
+                    <View className="flex-row items-center justify-between mb-2">
+                        <Text className="text-gray-500 font-JakartaMedium">Duration</Text>
+                        <Text className="font-JakartaBold">{formatTime(ride.ride_time)}</Text>
+                    </View>
+                    <View className="flex-row items-center justify-between">
+                        <Text className="text-gray-500 font-JakartaMedium">Distance</Text>
+                        {ride.ride_distance ? (
+                            <Text className="font-JakartaBold">{ride.ride_distance.toFixed(1)} km</Text>
+                        ) : (
+                            <Text className="font-JakartaBold">-</Text>
+                        )}
+                    </View>
+                </View>
+
+                {/* Rider Info (For Driver) */}
+                <Text className="text-lg font-JakartaBold mb-3">Rider</Text>
+                <View className="flex-row items-center bg-gray-50 p-4 rounded-xl mb-5">
+                    {ride.rider?.image && ride.rider.image !== "null" ? (
+                        <Image source={{ uri: ride.rider.image }} className="w-14 h-14 rounded-full mr-4" />
+                    ) : (
+                        <View className="w-14 h-14 bg-gray-200 rounded-full mr-4 items-center justify-center">
+                            <Image source={icons.person} className="w-8 h-8 text-gray-500" resizeMode="contain" />
+                        </View>
+                    )}
+
+                    <View className="flex-1">
+                        <Text className="text-lg font-JakartaSemiBold">{ride.rider?.name || "Rider"}</Text>
+                        <View className="flex-row items-center gap-1">
+                            <Image source={icons.star} className="w-4 h-4" />
+                            <Text className="text-gray-500">{ride.rider?.rating || "5.0"} Rating</Text>
+                        </View>
+                    </View>
+                </View>
+
+                {/* Earnings Breakdown (For Driver) */}
+                <Text className="text-lg font-JakartaBold mb-3">Earnings Breakdown</Text>
+                <View className="bg-gray-50 p-4 rounded-xl mb-5">
+                    <View className="flex-row justify-between mb-2">
+                        <Text className="text-gray-500">Gross Fare</Text>
+                        <Text className="font-JakartaMedium">₦{Math.round(ride.fare_price).toLocaleString()}</Text>
+                    </View>
+                    <View className="flex-row justify-between mb-2">
+                        <Text className="text-gray-500">App Commission</Text>
+                        <Text className="font-JakartaMedium text-red-500">- ₦{Math.round(ride.fare_price * 0).toLocaleString()}</Text>
+                        {/* Assuming 0% commission for now or calculate? */}
+                    </View>
+                    <View className="w-full h-[1px] bg-gray-200 my-2" />
+                    <View className="flex-row justify-between">
+                        <Text className="text-lg font-JakartaBold">Net Earnings</Text>
+                        <Text className="text-lg font-JakartaExtraBold text-[#0CC25F]">₦{Math.round(ride.fare_price).toLocaleString()}</Text>
+                    </View>
+                </View>
+
+                {/* Actions */}
+                <View className="flex-row gap-4 mb-10">
+                    <TouchableOpacity
+                        className="flex-1 bg-general-100 py-4 rounded-full items-center"
+                        onPress={() => Alert.alert("Help", "Contact Support feature coming soon")}
+                    >
+                        <Text className="font-JakartaBold text-gray-900">Report Issue</Text>
+                    </TouchableOpacity>
+                </View>
+
+            </ScrollView>
+        </SafeAreaView>
+    );
+};
+
+export default DriverRideHistoryDetails;
