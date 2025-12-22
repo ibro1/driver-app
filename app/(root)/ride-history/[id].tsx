@@ -4,6 +4,7 @@ import { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { icons, images } from "@/constants";
 import { useFetch, fetchAPI } from "@/lib/fetch";
+import Skeleton from "@/components/Skeleton";
 import { Ride } from "@/types/type";
 import { formatDate, formatTime } from "@/lib/utils";
 
@@ -37,8 +38,28 @@ const DriverRideHistoryDetails = () => {
 
     if (loading) {
         return (
-            <SafeAreaView className="flex-1 bg-white justify-center items-center">
-                <ActivityIndicator size="large" color="#0286FF" />
+            <SafeAreaView className="flex-1 bg-white px-5">
+                <View className="flex-row items-center justify-between my-5">
+                    <Skeleton width={150} height={30} />
+                    <Skeleton width={40} height={40} borderRadius={20} />
+                </View>
+                <Skeleton height={200} borderRadius={16} style={{ marginBottom: 20 }} />
+                <View className="bg-white rounded-xl shadow-sm shadow-neutral-300 p-4 border border-gray-100 mb-5 gap-3">
+                    <View className="flex-row justify-between">
+                        <Skeleton width={100} height={20} />
+                        <Skeleton width={60} height={20} borderRadius={10} />
+                    </View>
+                    <Skeleton width="100%" height={20} />
+                    <Skeleton width="100%" height={20} />
+                </View>
+                <Skeleton width={80} height={24} style={{ marginBottom: 12 }} />
+                <View className="flex-row items-center gap-4 bg-gray-50 p-4 rounded-xl">
+                    <Skeleton width={56} height={56} borderRadius={28} />
+                    <View className="gap-2 flex-1">
+                        <Skeleton width={120} height={20} />
+                        <Skeleton width={80} height={16} />
+                    </View>
+                </View>
             </SafeAreaView>
         );
     }
