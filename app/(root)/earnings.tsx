@@ -37,8 +37,8 @@ const Earnings = () => {
                 <Text className="text-white text-4xl font-JakartaBold mb-4">
                   ₦{earningsData?.total_earnings?.toFixed(2) || "0.00"}
                 </Text>
-                
-                <View className="flex-row justify-between bg-white/20 rounded-xl p-4">
+
+                <View className="flex-row justify-between bg-white/20 rounded-xl p-4 mb-4">
                   <View>
                     <Text className="text-white/80 text-sm font-JakartaMedium">Today</Text>
                     <Text className="text-white text-xl font-JakartaBold">
@@ -52,6 +52,13 @@ const Earnings = () => {
                     </Text>
                   </View>
                 </View>
+
+                <TouchableOpacity
+                  onPress={() => router.push("/(root)/wallet/add-bank")}
+                  className="bg-white py-3 rounded-full items-center"
+                >
+                  <Text className="text-[#0286FF] font-JakartaBold">Manage Payout Methods</Text>
+                </TouchableOpacity>
               </View>
 
               <Text className="text-lg font-JakartaBold text-neutral-800 mb-4">Recent Transactions</Text>
