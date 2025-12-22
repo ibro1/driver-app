@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Alert, Text, View, ScrollView } from "react-native";
+import { Alert, Text, View } from "react-native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -56,7 +57,7 @@ const Onboarding = () => {
 
     return (
         <SafeAreaView className="flex-1 bg-white">
-            <ScrollView className="flex-1 px-5">
+            <KeyboardAwareScrollView className="flex-1 px-5" enableOnAndroid={true} extraScrollHeight={20}>
                 <Text className="text-2xl font-JakartaBold mb-5 mt-5">Driver Registration</Text>
 
                 <Text className="text-lg font-JakartaSemiBold mb-3">Personal Info</Text>
@@ -125,7 +126,7 @@ const Onboarding = () => {
                     className="mt-10 mb-10"
                     disabled={loading}
                 />
-            </ScrollView>
+            </KeyboardAwareScrollView>
         </SafeAreaView>
     );
 };

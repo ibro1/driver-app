@@ -17,7 +17,7 @@ const Page = () => {
           // getDriverProfile now takes userId optionally or uses session
           // Assuming getDriverProfile handles it
           const profile = await getDriverProfile(user.id);
-          if (profile && profile.driver) {
+          if (profile && profile.driver && profile.vehicle) {
             setIsDriver(true);
           } else {
             setIsDriver(false);
