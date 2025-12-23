@@ -92,7 +92,7 @@ const Earnings = () => {
               </View>
               <View className="items-end">
                 <Text className="text-lg font-JakartaBold text-green-500">
-                  +₦{item.farePrice?.toFixed(2)}
+                  +₦{(item.driverPayout ?? item.farePrice ?? 0).toFixed(2)}
                 </Text>
                 <Text className="text-xs text-neutral-400 capitalize">
                   {item.paymentStatus}
