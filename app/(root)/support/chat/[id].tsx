@@ -83,6 +83,15 @@ const SupportChat = () => {
         }
     }, [messagesData]);
 
+    // Polling for new messages (Failsafe for sockets)
+    useEffect(() => {
+        const interval = setInterval(() => {
+            // console.log("Polling messages...");
+            refetch();
+        }, 3000);
+        return () => clearInterval(interval);
+    }, [refetch]);
+
     // Socket Connection
     useEffect(() => {
         if (!id) return;
