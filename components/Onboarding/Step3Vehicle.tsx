@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, TouchableOpacity, Alert } from "react-native";
+import { View, Text, Image, TouchableOpacity, Alert } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import CustomButton from "@/components/CustomButton";
 import InputField from "@/components/InputField";
@@ -30,6 +30,10 @@ const DOCUMENT_TYPES = [
 
 const Step3Vehicle: React.FC<Step3Props> = ({ initialData, onNext, onBack, loading }) => {
     const [form, setForm] = useState({
+        // License
+        licenseNumber: (initialData as any).licenseNumber || "",
+
+        // Vehicle
         vehicleMake: initialData.vehicleMake || "",
         vehicleModel: initialData.vehicleModel || "",
         vehicleYear: initialData.vehicleYear || "",
@@ -44,7 +48,8 @@ const Step3Vehicle: React.FC<Step3Props> = ({ initialData, onNext, onBack, loadi
     const isLagos = city.toLowerCase().includes("lagos");
 
     const documentTypes = [
-        { key: "insurance", label: "Vehicle Insurance Check" }, // Tweaked label
+        { key: "license", label: "Driver's License / ID Card" },
+        { key: "insurance", label: "Vehicle Insurance Check" },
         { key: "roadworthiness", label: "Road Worthiness Certificate" },
         {
             key: "hackney_permit",
@@ -53,15 +58,17 @@ const Step3Vehicle: React.FC<Step3Props> = ({ initialData, onNext, onBack, loadi
         { key: "ownership_proof", label: "Proof of Ownership" },
     ];
 
-    // Add LASDRI for Lagos if we want to be strict? User said "Regional Rules ... vehicle age".
-    // For now, let's keep it to the label change as a first step + Vehicle Year check?
-    // User mentioned "Vehicle Age". Let's add a warning if year is too old for Lagos (e.g. < 2005)
-
     const [documents, setDocuments] = useState<{ [key: string]: string }>(
-        (initialData.documents || []).reduce((acc: any, doc: any) => {
-            acc[doc.type] = doc.url;
-            return acc;
-        }, {})
+        () => {
+            const docs = (initialData.documents || []).reduce((acc: any, doc: any) => {
+                acc[doc.type] = doc.url;
+                return acc;
+            }, {});
+            if ((initialData as any).licenseUrl && !docs['license']) {
+                docs['license'] = (initialData as any).licenseUrl;
+            }
+            return docs;
+        }
     );
     const [uploading, setUploading] = useState(false);
 
@@ -78,6 +85,11 @@ const Step3Vehicle: React.FC<Step3Props> = ({ initialData, onNext, onBack, loadi
     };
 
     const handleNext = async () => {
+        if (!form.licenseNumber) {
+            Alert.alert("Error", "Please provide License Number.");
+            return;
+        }
+
         if (!form.vehicleMake || !form.vehicleModel || !form.vehiclePlateNumber) {
             Alert.alert("Error", "Please fill vehicle details");
             return;
@@ -102,15 +114,23 @@ const Step3Vehicle: React.FC<Step3Props> = ({ initialData, onNext, onBack, loadi
         setUploading(true);
         try {
             const uploadedDocs = [];
+            let processedLicenseUrl = null;
+
             for (const docType of Object.keys(documents)) {
                 let url = documents[docType];
                 if (url && !url.startsWith("http")) {
                     url = await uploadFile(url);
                 }
                 uploadedDocs.push({ type: docType, url });
+
+                if (docType === 'license') {
+                    processedLicenseUrl = url;
+                }
             }
 
-            onNext({ ...form, documents: uploadedDocs });
+            // Send licenseUrl separately to match backend logic, or just rely on 'license' type in documents array (which backend also handles in loop).
+            // Backend handles both. We'll send both for robustness.
+            onNext({ ...form, licenseUrl: processedLicenseUrl, documents: uploadedDocs });
         } catch (error: any) {
             Alert.alert("Upload Error", error.message);
         } finally {
@@ -120,7 +140,16 @@ const Step3Vehicle: React.FC<Step3Props> = ({ initialData, onNext, onBack, loadi
 
     return (
         <View className="flex-1">
-            <Text className="text-xl font-JakartaBold mb-5">Vehicle & Documents</Text>
+            <Text className="text-2xl font-JakartaBold mb-5">Credentials & Vehicle</Text>
+
+            <Text className="text-xl font-JakartaBold mb-3 mt-5">Vehicle Details</Text>
+
+            <InputField
+                label="License Number"
+                placeholder="Driver's License Number"
+                value={form.licenseNumber}
+                onChangeText={(t) => setForm({ ...form, licenseNumber: t })}
+            />
 
             <InputField label="Make" placeholder="Toyota" value={form.vehicleMake} onChangeText={(t) => setForm({ ...form, vehicleMake: t })} />
             <InputField label="Model" placeholder="Camry" value={form.vehicleModel} onChangeText={(t) => setForm({ ...form, vehicleModel: t })} />
@@ -134,7 +163,7 @@ const Step3Vehicle: React.FC<Step3Props> = ({ initialData, onNext, onBack, loadi
             </View>
             <InputField label="Plate Number" placeholder="Number Plate" value={form.vehiclePlateNumber} onChangeText={(t) => setForm({ ...form, vehiclePlateNumber: t })} />
 
-            <Text className="text-lg font-JakartaSemiBold mt-5 mb-3">Required Documents ({city})</Text>
+            <Text className="text-xl font-JakartaBold mt-5 mb-3">Required Documents ({city})</Text>
             {documentTypes.map((doc) => (
                 <View key={doc.key} className="flex-row items-center justify-between bg-neutral-100 p-4 rounded-xl mb-3 border border-neutral-200">
                     <Text className="font-JakartaMedium text-base flex-1">{doc.label}</Text>

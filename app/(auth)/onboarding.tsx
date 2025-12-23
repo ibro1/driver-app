@@ -101,7 +101,14 @@ const Onboarding = () => {
                 <View className={`h-full bg-primary-500 ${step >= 3 ? "w-1/3" : "w-0"}`} />
             </View>
 
-            <KeyboardAwareScrollView className="flex-1 px-5" contentContainerStyle={{ paddingBottom: 50 }}>
+            <KeyboardAwareScrollView
+                className="flex-1 px-5"
+                contentContainerStyle={{ paddingBottom: 100, flexGrow: 1 }}
+                enableOnAndroid={true}
+                enableResetScrollToCoords={false}
+                keyboardShouldPersistTaps="handled"
+                extraScrollHeight={100}
+            >
                 {step === 1 && (
                     <Step1City
                         initialData={data}

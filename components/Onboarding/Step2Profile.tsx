@@ -10,10 +10,9 @@ interface Step2Props {
     initialData: {
         firstName: string;
         lastName: string;
+        email?: string;
         nin: string;
-        licenseNumber: string;
-        licenseUrl?: string;
-        profileImageUrl?: string; // Add profile image too? The plan says "Personal Info... Camera interface"
+        profileImageUrl?: string;
     };
     onNext: (data: any) => void;
     onBack: () => void;
@@ -24,39 +23,38 @@ const Step2Profile: React.FC<Step2Props> = ({ initialData, onNext, onBack, loadi
     const [form, setForm] = useState({
         firstName: initialData.firstName || "",
         lastName: initialData.lastName || "",
+        email: initialData.email || "",
         nin: initialData.nin || "",
-        licenseNumber: initialData.licenseNumber || "",
     });
-    const [licenseImage, setLicenseImage] = useState<string | null>(initialData.licenseUrl || null);
+    const [profileImage, setProfileImage] = useState<string | null>(initialData.profileImageUrl || null);
     const [uploading, setUploading] = useState(false);
 
     const pickImage = async () => {
-        const result = await ImagePicker.launchCameraAsync({ // Camera preferred for license
+        const result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.Images,
             allowsEditing: true,
-            aspect: [4, 3],
+            aspect: [1, 1],
             quality: 0.5,
         });
 
         if (!result.canceled) {
-            setLicenseImage(result.assets[0].uri);
+            setProfileImage(result.assets[0].uri);
         }
     };
 
     const handleNext = async () => {
-        if (!form.firstName || !form.lastName || !form.nin || !form.licenseNumber || !licenseImage) {
-            Alert.alert("Error", "Please fill all fields and upload license.");
+        if (!form.firstName || !form.lastName || !form.email || !form.nin || !profileImage) {
+            Alert.alert("Error", "Please fill all fields and upload a profile photo.");
             return;
         }
 
         setUploading(true);
         try {
-            let licenseUrl = licenseImage;
-            // Only upload if it's a local file (not already a remote URL)
-            if (licenseImage && !licenseImage.startsWith("http")) {
-                licenseUrl = await uploadFile(licenseImage);
+            let profileImageUrl = profileImage;
+            if (profileImage && !profileImage.startsWith("http")) {
+                profileImageUrl = await uploadFile(profileImage);
             }
-            onNext({ ...form, licenseUrl });
+            onNext({ ...form, profileImageUrl });
         } catch (error: any) {
             Alert.alert("Upload Error", error.message);
         } finally {
@@ -65,8 +63,19 @@ const Step2Profile: React.FC<Step2Props> = ({ initialData, onNext, onBack, loadi
     };
 
     return (
-        <View className="flex-1">
+        <View>
             <Text className="text-xl font-JakartaBold mb-5">Personal Details</Text>
+
+            <View className="items-center mb-5">
+                <TouchableOpacity onPress={pickImage} className="w-24 h-24 bg-gray-100 rounded-full items-center justify-center border border-gray-300 overflow-hidden">
+                    {profileImage ? (
+                        <Image source={{ uri: profileImage }} className="w-full h-full" resizeMode="cover" />
+                    ) : (
+                        <Image source={icons.profile} className="w-10 h-10 tint-gray-400" resizeMode="contain" />
+                    )}
+                </TouchableOpacity>
+                <Text className="text-primary-500 mt-2 font-JakartaMedium" onPress={pickImage}>Upload Profile Photo</Text>
+            </View>
 
             <InputField
                 label="First Name"
@@ -81,29 +90,18 @@ const Step2Profile: React.FC<Step2Props> = ({ initialData, onNext, onBack, loadi
                 onChangeText={(t) => setForm({ ...form, lastName: t })}
             />
             <InputField
+                label="Email Address"
+                placeholder="Enter email address"
+                value={form.email}
+                onChangeText={(t) => setForm({ ...form, email: t })}
+                keyboardType="email-address"
+            />
+            <InputField
                 label="NIN"
                 placeholder="National Identity Number"
                 value={form.nin}
                 onChangeText={(t) => setForm({ ...form, nin: t })}
             />
-            <InputField
-                label="License Number"
-                placeholder="Driver's License Number"
-                value={form.licenseNumber}
-                onChangeText={(t) => setForm({ ...form, licenseNumber: t })}
-            />
-
-            <Text className="text-lg font-JakartaSemiBold mt-5 mb-3">License Photo</Text>
-            <TouchableOpacity onPress={pickImage} className="w-full h-40 bg-gray-100 rounded-lg items-center justify-center border border-dashed border-gray-300 mb-5">
-                {licenseImage ? (
-                    <Image source={{ uri: licenseImage }} className="w-full h-full rounded-lg" resizeMode="cover" />
-                ) : (
-                    <View className="items-center">
-                        <Image source={icons.upload} className="w-8 h-8 tint-gray-400" resizeMode="contain" />
-                        <Text className="text-gray-500 mt-2">Tap to take photo</Text>
-                    </View>
-                )}
-            </TouchableOpacity>
 
             <View className="flex-row justify-between mt-5 gap-3">
                 <CustomButton

@@ -31,7 +31,7 @@ const InputField = ({
     >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View className="mb-5 w-full">
-          <Text className={`text-lg font-JakartaSemiBold mb-3 ${labelStyle}`}>
+          <Text className={`text-base font-JakartaSemiBold mb-3 ${labelStyle}`}>
             {label}
           </Text>
           <View
