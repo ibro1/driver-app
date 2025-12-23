@@ -18,7 +18,7 @@ const SideMenu = ({ isVisible, onClose }: SideMenuProps) => {
     { icon: icons.profile, label: "Profile", route: "/(root)/(tabs)/profile" },
     { icon: icons.dollar, label: "Earnings", route: "/(root)/earnings" },
     { icon: icons.list, label: "Ride History", route: "/(root)/(tabs)/rides" },
-    { icon: icons.chat, label: "Support", route: "/(root)/(tabs)/chat" },
+    { icon: icons.chat, label: "Support", route: "/(root)/support" },
   ];
 
   const handleNavigation = (route: string) => {
