@@ -227,17 +227,19 @@ export const uploadFile = async (fileUri: string): Promise<string> => {
     if (!token) throw new Error("Not authenticated");
 
     const formData = new FormData();
-    formData.append("file", {
+    const fileData = {
         uri: fileUri,
         name: `profile-${Date.now()}.jpg`,
         type: "image/jpeg",
-    } as any);
+    };
+    formData.append("file", fileData as any);
 
     const response = await fetch(`${API_URL}/api/upload`, {
         method: "POST",
         headers: {
             Authorization: `Bearer ${token}`,
-            "Content-Type": "multipart/form-data",
+            // Content-Type is intentionally omitted to let fetch set the boundary
+            "Accept": "application/json",
         },
         body: formData,
     });

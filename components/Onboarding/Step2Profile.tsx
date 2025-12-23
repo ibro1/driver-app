@@ -99,7 +99,7 @@ const Step2Profile: React.FC<Step2Props> = ({ initialData, onNext, onBack, loadi
                     <Image source={{ uri: licenseImage }} className="w-full h-full rounded-lg" resizeMode="cover" />
                 ) : (
                     <View className="items-center">
-                        <Image source={icons.point} className="w-8 h-8 tint-gray-400" resizeMode="contain" />
+                        <Image source={icons.upload} className="w-8 h-8 tint-gray-400" resizeMode="contain" />
                         <Text className="text-gray-500 mt-2">Tap to take photo</Text>
                     </View>
                 )}

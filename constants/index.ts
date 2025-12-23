@@ -13,6 +13,7 @@ import list from "@/assets/icons/list.png";
 import lock from "@/assets/icons/lock.png";
 import map from "@/assets/icons/map.png";
 import marker from "@/assets/icons/marker.png";
+import upload from "@/assets/icons/upload.png";
 import out from "@/assets/icons/out.png";
 import calendar from "@/assets/icons/calendar.png";
 import person from "@/assets/icons/person.png";
@@ -57,6 +58,7 @@ export const icons = {
   close,
   dollar,
   email,
+  upload,
   eyecross,
   google,
   home,

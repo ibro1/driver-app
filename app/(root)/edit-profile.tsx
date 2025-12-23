@@ -57,23 +57,16 @@ const EditProfile = () => {
             const uploadUrl = `${process.env.EXPO_PUBLIC_API_URL}/api/upload`;
 
             const formData = new FormData();
-            const filename = uri.split('/').pop() || 'profile.jpg';
-            const match = /\.(\w+)$/.exec(filename);
-            const type = match ? `image/${match[1]}` : 'image/jpeg';
-
-            formData.append('file', {
-                uri: Platform.OS === 'android' ? uri : uri.replace('file://', ''),
-                name: filename,
-                type: type,
+            formData.append("file", {
+                uri: uri,
+                name: `profile-${Date.now()}.jpg`,
+                type: "image/jpeg",
             } as any);
 
             const response = await fetch(uploadUrl, {
                 method: "POST",
                 headers: {
                     "Authorization": `Bearer ${token}`,
-                    // Accept header is good practice
-                    "Accept": "application/json",
-                    // Content-Type must strictly be omitted
                 },
                 body: formData,
             });
