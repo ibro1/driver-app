@@ -33,8 +33,15 @@ const Verification = () => {
             const response = await verifyOtp(phone as string, code.value);
 
             if (response.success) {
-                setIsNewUser(response.isNewUser);
-                setShowSuccessModal(true);
+                const isNew = response.isNewUser;
+                setIsNewUser(!!isNew);
+
+                if (isNew) {
+                    setShowSuccessModal(true);
+                } else {
+                    // Existing user - login immediately without modal
+                    router.replace("/(root)/(tabs)/home");
+                }
             } else {
                 setCode({
                     ...code,

@@ -149,8 +149,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
                 }
                 console.log("Initiating Firebase SMS...");
                 const confirmation = await signInWithPhoneNumber(auth, phone, verifier);
+                console.log("Firebase signInWithPhoneNumber result:", confirmation ? "Success (Obj)" : "Null");
                 setVerificationId(confirmation);
                 console.log("Firebase SMS sent successfully");
+            } else {
+                console.log("Backend said useFirebase = FALSE. Using standard SMS.");
             }
         } catch (error) {
             throw error;

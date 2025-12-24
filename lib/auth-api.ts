@@ -471,14 +471,14 @@ export const sendOtp = async (phone: string): Promise<any> => {
 /**
  * Verify OTP
  */
-export const verifyOtp = async (phone: string, code: string): Promise<any> => {
+export const verifyOtp = async (phone: string, code: string, idToken?: string): Promise<any> => {
     const response = await fetch(`${API_URL}/api/auth/otp/verify`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
             "Origin": "myapp://",
         },
-        body: JSON.stringify({ phone, code }),
+        body: JSON.stringify({ phone, code, idToken }),
     });
 
     const data = await handleResponse(response, "Failed to verify OTP");
