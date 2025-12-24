@@ -127,8 +127,16 @@ jobs:
         run: |
           export NODE_OPTIONS="--openssl-legacy-provider --max_old_space_size=4096"
           eas build --platform android --profile development --local --non-interactive
-          # Find and move the built APK
-          find . -name "*.apk" -type f -not -path "./build-output/*" -exec cp {} ./build-output/app-dev.apk \;
+          # Find the built APK and copy it to build-output
+          BUILD_PATH=$(find . -type f -name "*.apk" | grep -v "build-output" | head -n 1)
+          if [ -n "$BUILD_PATH" ]; then
+            echo "Found APK at: $BUILD_PATH"
+            cp "$BUILD_PATH" ./build-output/app-dev.apk
+            echo "Copied to ./build-output/app-dev.apk"
+          else
+            echo "No APK found!"
+            exit 1
+          fi
         env:
           NODE_ENV: development
 
@@ -140,8 +148,16 @@ jobs:
         run: |
           export NODE_OPTIONS="--openssl-legacy-provider --max_old_space_size=4096"
           eas build --platform android --profile preview --local --non-interactive
-          # Find and move the built APK
-          find . -name "*.apk" -type f -not -path "./build-output/*" -exec cp {} ./build-output/app-prod.apk \;
+          # Find the built APK and copy it to build-output
+          BUILD_PATH=$(find . -type f -name "*.apk" | grep -v "build-output" | head -n 1)
+          if [ -n "$BUILD_PATH" ]; then
+            echo "Found APK at: $BUILD_PATH"
+            cp "$BUILD_PATH" ./build-output/app-prod.apk
+            echo "Copied to ./build-output/app-prod.apk"
+          else
+            echo "No APK found!"
+            exit 1
+          fi
         env:
           NODE_ENV: production
 
@@ -153,8 +169,16 @@ jobs:
         run: |
           export NODE_OPTIONS="--openssl-legacy-provider --max_old_space_size=4096"
           eas build --platform android --profile production --local --non-interactive
-          # Find and move the built AAB
-          find . -name "*.aab" -type f -not -path "./build-output/*" -exec cp {} ./build-output/app-prod.aab \;
+          # Find the built AAB and copy it to build-output
+          BUILD_PATH=$(find . -type f -name "*.aab" | grep -v "build-output" | head -n 1)
+          if [ -n "$BUILD_PATH" ]; then
+            echo "Found AAB at: $BUILD_PATH"
+            cp "$BUILD_PATH" ./build-output/app-prod.aab
+            echo "Copied to ./build-output/app-prod.aab"
+          else
+            echo "No AAB found!"
+            exit 1
+          fi
         env:
           NODE_ENV: production
 
@@ -162,11 +186,17 @@ jobs:
         run: |
           echo "Contents of build-output directory:"
           ls -lah ./build-output/ || echo "No build-output directory found"
+          echo "---"
+          echo "Checking for files:"
+          if [ -f ./build-output/app-dev.apk ]; then echo "✓ app-dev.apk found"; fi
+          if [ -f ./build-output/app-prod.apk ]; then echo "✓ app-prod.apk found"; fi
+          if [ -f ./build-output/app-prod.aab ]; then echo "✓ app-prod.aab found"; fi
 
       - name: 📦 Upload build artifacts to GitHub
         uses: actions/upload-artifact@v4
+        if: always()
         with:
-          name: app-builds
+          name: app-builds-${{ github.run_number }}
           path: ./build-output/
           retention-days: 7
           if-no-files-found: warn
