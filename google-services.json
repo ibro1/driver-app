@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "137747277950",
+    "project_id": "karride-c23bf",
+    "storage_bucket": "karride-c23bf.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:137747277950:android:277edacb0614113f07502f",
+        "android_client_info": {
+          "package_name": "ng.karride"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA09RjqWZF1j9YIshM42_5e1JpcTR_1zgg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:137747277950:android:5cbb390c45d2b89907502f",
+        "android_client_info": {
+          "package_name": "ng.karride.driver"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA09RjqWZF1j9YIshM42_5e1JpcTR_1zgg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

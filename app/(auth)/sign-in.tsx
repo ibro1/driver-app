@@ -1,7 +1,9 @@
 import { router } from "expo-router";
-import { useCallback, useState } from "react";
+import { useCallback, useState, useRef } from "react";
 import { Alert, Image, ScrollView, Text, View, TouchableOpacity, FlatList } from "react-native";
 import { ReactNativeModal } from "react-native-modal";
+import FirebaseRecaptchaVerifierModal from "@/components/FirebaseRecaptchaVerifierModal";
+import { firebaseConfig } from "@/lib/firebase";
 
 import CustomButton from "@/components/CustomButton";
 import InputField from "@/components/InputField";
@@ -28,6 +30,7 @@ const SignIn = () => {
     countryFlag: "🇳🇬",
   });
 
+  const recaptchaVerifier = useRef(null);
   const [isCountryPickerVisible, setCountryPickerVisible] = useState(false);
 
   const onSignInPress = useCallback(async () => {
@@ -48,7 +51,7 @@ const SignIn = () => {
 
       const fullPhone = `${form.countryCode}${phoneNumber}`;
       // Pass verifier to sendOtp
-      await sendOtp(fullPhone);
+      await sendOtp(fullPhone, recaptchaVerifier.current);
 
       router.push({
         pathname: "/(auth)/verification",
@@ -131,6 +134,12 @@ const SignIn = () => {
           </ReactNativeModal>
 
         </View>
+
+        <FirebaseRecaptchaVerifierModal
+          ref={recaptchaVerifier}
+          firebaseConfig={firebaseConfig}
+        />
+
       </View>
     </ScrollView>
   );
