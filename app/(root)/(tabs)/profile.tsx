@@ -142,16 +142,27 @@ const Profile = () => {
           </View>
         </View>
 
-        {/* Edit Profile Action */}
+        {/* Account Settings */}
         <View className="bg-white border border-neutral-100 rounded-2xl overflow-hidden shadow-sm mb-6">
           <TouchableOpacity
             onPress={() => router.push("/(root)/edit-profile")}
-            className="flex-row items-center p-4"
+            className="flex-row items-center p-4 border-b border-neutral-100"
           >
             <View className="w-8 h-8 bg-neutral-50 rounded-full items-center justify-center mr-3">
               <Image source={icons.person} className="w-4 h-4" resizeMode="contain" tintColor="#333" />
             </View>
             <Text className="text-base font-JakartaMedium text-neutral-800 flex-1">Edit Profile</Text>
+            <Image source={icons.arrowDown} className="w-4 h-4 -rotate-90" tintColor="#C4C4C4" />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => router.push("/(root)/emergency-contacts")}
+            className="flex-row items-center p-4"
+          >
+            <View className="w-8 h-8 bg-neutral-50 rounded-full items-center justify-center mr-3">
+              <Image source={icons.phone} className="w-4 h-4" resizeMode="contain" tintColor="#333" />
+            </View>
+            <Text className="text-base font-JakartaMedium text-neutral-800 flex-1">Emergency Contacts</Text>
             <Image source={icons.arrowDown} className="w-4 h-4 -rotate-90" tintColor="#C4C4C4" />
           </TouchableOpacity>
         </View>

@@ -297,6 +297,30 @@ export const registerDriver = async (
 };
 
 /**
+ * Update Driver Profile (including emergency contacts)
+ */
+export const updateUserProfile = async (data: {
+    firstName?: string;
+    lastName?: string;
+    profileImageUrl?: string;
+    emergencyContacts?: { name: string; phone: string; email?: string }[];
+}): Promise<any> => {
+    const token = await SecureStore.getItemAsync("session_token");
+    if (!token) throw new Error("Not authenticated");
+
+    const response = await fetch(`${API_URL}/api/driver/profile`, {
+        method: "PATCH",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(data),
+    });
+
+    return await handleResponse(response, "Failed to update profile");
+};
+
+/**
  * Get driver profile
  */
 export const getDriverProfile = async (userId?: string): Promise<any> => {
