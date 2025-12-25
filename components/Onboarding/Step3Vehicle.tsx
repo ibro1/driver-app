@@ -71,6 +71,16 @@ const Step3Vehicle: React.FC<Step3Props> = ({ initialData, onNext, onBack, loadi
             return docs;
         }
     );
+
+    const [docStatuses, setDocStatuses] = useState<{ [key: string]: { status: string, reason?: string } }>(
+        () => {
+            return (initialData.documents || []).reduce((acc: any, doc: any) => {
+                acc[doc.type] = { status: doc.status, reason: doc.rejectionReason };
+                return acc;
+            }, {});
+        }
+    );
+
     const [uploading, setUploading] = useState(false);
 
     const pickDocument = async (type: string) => {
@@ -82,6 +92,8 @@ const Step3Vehicle: React.FC<Step3Props> = ({ initialData, onNext, onBack, loadi
 
         if (!result.canceled) {
             setDocuments(prev => ({ ...prev, [type]: result.assets[0].uri }));
+            // Reset status on new upload so it looks "pending" or just "uploaded" locally
+            setDocStatuses(prev => ({ ...prev, [type]: { status: 'new_upload' } }));
         }
     };
 
@@ -119,6 +131,9 @@ const Step3Vehicle: React.FC<Step3Props> = ({ initialData, onNext, onBack, loadi
 
             for (const docType of Object.keys(documents)) {
                 let url = documents[docType];
+                // Only upload if it's a local file (file://) or explicit upload
+                // If it is http and ALREADY approved/pending, maybe skip re-upload?
+                // But simplified logic: check if http.
                 if (url && !url.startsWith("http")) {
                     url = await uploadFile(url);
                 }
@@ -165,19 +180,36 @@ const Step3Vehicle: React.FC<Step3Props> = ({ initialData, onNext, onBack, loadi
             <InputField label="Plate Number" placeholder="Number Plate" value={form.vehiclePlateNumber} onChangeText={(t) => setForm({ ...form, vehiclePlateNumber: t })} />
 
             <Text className="text-xl font-JakartaBold mt-5 mb-3">Required Documents ({city})</Text>
-            {documentTypes.map((doc) => (
-                <View key={doc.key} className="flex-row items-center justify-between bg-neutral-100 p-4 rounded-xl mb-3 border border-neutral-200">
-                    <Text className="font-JakartaMedium text-base flex-1">{doc.label}</Text>
-                    <TouchableOpacity
-                        onPress={() => pickDocument(doc.key)}
-                        className={`px-4 py-2 rounded-full ${documents[doc.key] ? "bg-green-100" : "bg-white border border-neutral-300"}`}
-                    >
-                        <Text className={`${documents[doc.key] ? "text-green-700 font-bold" : "text-black"}`}>
-                            {documents[doc.key] ? "Uploaded ✓" : "Upload"}
-                        </Text>
-                    </TouchableOpacity>
-                </View>
-            ))}
+            {documentTypes.map((doc) => {
+                const statusInfo = docStatuses[doc.key];
+                const isRejected = statusInfo?.status === 'rejected';
+
+                return (
+                    <View key={doc.key} className="bg-neutral-100 p-4 rounded-xl mb-3 border border-neutral-200">
+                        <View className="flex-row items-center justify-between">
+                            <Text className="font-JakartaMedium text-base flex-1">{doc.label}</Text>
+                            <TouchableOpacity
+                                onPress={() => pickDocument(doc.key)}
+                                className={`px-4 py-2 rounded-full ${isRejected ? "bg-red-100 border border-red-300" :
+                                        documents[doc.key] ? "bg-green-100" : "bg-white border border-neutral-300"
+                                    }`}
+                            >
+                                <Text className={`${isRejected ? "text-red-700 font-bold" :
+                                        documents[doc.key] ? "text-green-700 font-bold" : "text-black"
+                                    }`}>
+                                    {isRejected ? "Re-upload" :
+                                        documents[doc.key] ? "Uploaded ✓" : "Upload"}
+                                </Text>
+                            </TouchableOpacity>
+                        </View>
+                        {isRejected && statusInfo?.reason && (
+                            <Text className="text-red-500 text-sm mt-2 ml-1">
+                                Reason: {statusInfo.reason}
+                            </Text>
+                        )}
+                    </View>
+                );
+            })}
 
             <View className="flex-row justify-between mt-5 gap-3 mb-10">
                 <CustomButton
