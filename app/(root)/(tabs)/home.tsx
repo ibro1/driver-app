@@ -69,7 +69,13 @@ const DriverHome = () => {
 
                         // 2. Setup Socket
                         const socket = getSocket();
-                        socket.emit("join_driver_room", driverId);
+                        const joinDriverRoom = () => {
+                            console.log(`[DriverApp] Joining driver room: driver_${driverId} (Socket ID: ${socket.id})`);
+                            socket.emit("join_driver_room", driverId);
+                        };
+
+                        if (socket.connected) joinDriverRoom();
+                        socket.on("connect", joinDriverRoom);
 
                         socket.on("new_ride_request", (data) => {
                             setRideRequest(data);
