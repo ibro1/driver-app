@@ -1,7 +1,8 @@
 import { View, Text, FlatList, ActivityIndicator, Image, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
-import { icons } from "@/constants";
+import { icons, images } from "@/constants";
+const noResultImage = images.noResult;
 import { useFetch } from "@/lib/fetch";
 import { useUser } from "@/lib/auth-context";
 import { formatDate, formatTime } from "@/lib/utils";
@@ -113,7 +114,7 @@ const Earnings = () => {
           )}
           ListEmptyComponent={() => (
             <View className="items-center py-20">
-              <Image source={images.noResult} className="w-20 h-20 opacity-20 mb-4" resizeMode="contain" />
+              <Image source={noResultImage} className="w-20 h-20 opacity-20 mb-4" resizeMode="contain" />
               <Text className="text-gray-400 font-JakartaMedium">No recent transactions</Text>
             </View>
           )}

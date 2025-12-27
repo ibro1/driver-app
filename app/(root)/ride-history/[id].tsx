@@ -109,6 +109,7 @@ const DriverRideHistoryDetails = () => {
                             <Image source={icons.calendar} className="w-5 h-5 text-gray-500" />
                             <Text className="text-md font-JakartaBold text-gray-800">{formatDate(ride.created_at)}</Text>
                         </View>
+                        <RideStatusBadge status={ride.status} />
                     </View>
 
                     <View className="flex-row items-center justify-between mb-2">
@@ -163,7 +164,7 @@ const DriverRideHistoryDetails = () => {
                     <View className="flex-row items-center justify-between">
                         <View className="flex-row items-center gap-3">
                             <View className={`w-2 h-2 rounded-full ${ride.payment_status === 'paid' ? 'bg-emerald-500' : 'bg-red-500'}`} />
-                            <Text className="text-gray-600 font-JakartaMedium">Payout Status</Text>
+                            <Text className="text-gray-600 font-JakartaMedium">Income Status</Text>
                         </View>
                         <View className={`px-4 py-1.5 rounded-full ${ride.payment_status === 'paid' ? 'bg-emerald-50' : 'bg-red-50'}`}>
                             <Text className={`text-xs capitalize font-JakartaExtraBold ${ride.payment_status === 'paid' ? 'text-emerald-700' : 'text-red-700'}`}>

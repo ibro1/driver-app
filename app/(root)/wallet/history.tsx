@@ -2,6 +2,7 @@ import { View, Text, FlatList, ActivityIndicator, Image, TouchableOpacity } from
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import { icons, images } from "@/constants";
+const noResultImage = images.noResult;
 import { useFetch } from "@/lib/fetch";
 import { formatDate } from "@/lib/utils";
 
@@ -43,7 +44,7 @@ const PayoutHistory = () => {
                     contentContainerStyle={{ padding: 20 }}
                     ListEmptyComponent={() => (
                         <View className="items-center py-10">
-                            <Image source={images.noResult} className="w-40 h-40" resizeMode="contain" />
+                            <Image source={noResultImage} className="w-40 h-40" resizeMode="contain" />
                             <Text className="text-neutral-500 font-JakartaMedium mt-4">No payout history yet.</Text>
                         </View>
                     )}
