@@ -13,11 +13,12 @@ import { useLocationStore } from "@/store";
 import { getSocket } from "@/lib/socket";
 import SideMenu from "@/components/SideMenu";
 import EarningsWidget from "@/components/EarningsWidget";
+import Skeleton from "@/components/Skeleton";
 
 const DriverHome = () => {
     const { user, signOut } = useAuth();
     const { setUserLocation } = useLocationStore();
-    const [loading, setLoading] = useState(true);
+    const [isInitializingLocation, setIsInitializingLocation] = useState(true);
     const [hasPermission, setHasPermission] = useState(false);
     const [isOnline, setIsOnline] = useState(false);
     const [location, setLocation] = useState<Location.LocationObject | null>(null);
@@ -28,13 +29,14 @@ const DriverHome = () => {
 
     const [verificationStatus, setVerificationStatus] = useState<string | null>(null);
 
-    const { data: earningsData, refetch: refetchEarnings } = useFetch<any>(`/api/driver/${user?.id}/earnings`);
+    const { data: earningsData, loading: earningsLoading, refetch: refetchEarnings } = useFetch<any>(`/api/driver/${user?.id}/earnings`);
 
     useEffect(() => {
         const requestLocation = async () => {
             let { status } = await Location.requestForegroundPermissionsAsync();
             if (status !== "granted") {
                 Alert.alert("Permission to access location was denied");
+                setIsInitializingLocation(false);
                 return;
             }
             setHasPermission(true);
@@ -45,7 +47,7 @@ const DriverHome = () => {
                 longitude: location.coords.longitude,
                 address: "Current Location",
             });
-            setLoading(false);
+            setIsInitializingLocation(false);
         };
 
         requestLocation();
@@ -263,13 +265,6 @@ const DriverHome = () => {
         }
     };
 
-    if (loading) {
-        return (
-            <View className="flex-1 justify-center items-center bg-white">
-                <ActivityIndicator size="large" color="#0286FF" />
-            </View>
-        );
-    }
 
     return (
         <View className="flex-1 bg-white">
@@ -287,20 +282,26 @@ const DriverHome = () => {
                     </TouchableOpacity>
 
                     {/* Online Toggle (Centered Button) */}
-                    <TouchableOpacity
-                        onPress={toggleOnlineStatus}
-                        disabled={isTogglingStatus}
-                        className={`flex-row items-center justify-center rounded-full px-6 py-3 shadow-md pointer-events-auto ${isOnline ? "bg-green-500" : (verificationStatus === "verified" ? "bg-orange-500" : "bg-gray-400")} ${isTogglingStatus ? "opacity-70" : ""}`}
-                    >
-                        {isTogglingStatus ? (
-                            <ActivityIndicator size="small" color="#fff" className="mr-2" />
-                        ) : (
-                            <View className="w-2 h-2 rounded-full bg-white mr-2" />
-                        )}
-                        <Text className="text-white font-JakartaBold text-sm">
-                            {isTogglingStatus ? "Updating..." : (isOnline ? "Go Offline" : "Go Online")}
-                        </Text>
-                    </TouchableOpacity>
+                    {isInitializingLocation ? (
+                        <View className="bg-white rounded-full px-6 py-3 shadow-md pointer-events-auto">
+                            <Skeleton width={100} height={20} borderRadius={10} />
+                        </View>
+                    ) : (
+                        <TouchableOpacity
+                            onPress={toggleOnlineStatus}
+                            disabled={isTogglingStatus}
+                            className={`flex-row items-center justify-center rounded-full px-6 py-3 shadow-md pointer-events-auto ${isOnline ? "bg-green-500" : (verificationStatus === "verified" ? "bg-orange-500" : "bg-gray-400")} ${isTogglingStatus ? "opacity-70" : ""}`}
+                        >
+                            {isTogglingStatus ? (
+                                <ActivityIndicator size="small" color="#fff" className="mr-2" />
+                            ) : (
+                                <View className="w-2 h-2 rounded-full bg-white mr-2" />
+                            )}
+                            <Text className="text-white font-JakartaBold text-sm">
+                                {isTogglingStatus ? "Updating..." : (isOnline ? "Go Offline" : "Go Online")}
+                            </Text>
+                        </TouchableOpacity>
+                    )}
 
                     {/* Empty View for Balance */}
                     <View className="w-12" />
@@ -327,6 +328,7 @@ const DriverHome = () => {
                 <EarningsWidget
                     earnings={earningsData?.today_earnings || 0}
                     ridesCount={earningsData?.today_rides || 0}
+                    loading={earningsLoading}
                 />
             </View>
 

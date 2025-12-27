@@ -1,13 +1,15 @@
 import { View, Text, TouchableOpacity, Image } from "react-native";
 import { icons } from "@/constants";
 import { router } from "expo-router";
+import Skeleton from "./Skeleton";
 
 interface EarningsWidgetProps {
     earnings: number;
     ridesCount: number;
+    loading?: boolean;
 }
 
-const EarningsWidget = ({ earnings, ridesCount }: EarningsWidgetProps) => {
+const EarningsWidget = ({ earnings, ridesCount, loading }: EarningsWidgetProps) => {
     return (
         <View className="bg-white rounded-3xl p-6 shadow-sm shadow-neutral-200 mx-5 mb-6 border border-neutral-50">
             <View className="flex-row justify-between items-center mb-6">
@@ -30,18 +32,26 @@ const EarningsWidget = ({ earnings, ridesCount }: EarningsWidgetProps) => {
 
             <View className="flex-row justify-between items-center">
                 <View className="items-center flex-1 border-r border-neutral-100">
-                    <Text className="text-2xl font-JakartaExtraBold text-emerald-600">
-                        ₦{earnings.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                    </Text>
+                    {loading ? (
+                        <Skeleton width={100} height={28} borderRadius={8} />
+                    ) : (
+                        <Text className="text-2xl font-JakartaExtraBold text-emerald-600">
+                            ₦{earnings.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        </Text>
+                    )}
                     <Text className="text-[12px] font-JakartaMedium text-gray-400 mt-1 uppercase tracking-wider">
                         Earnings
                     </Text>
                 </View>
 
                 <View className="items-center flex-1">
-                    <Text className="text-2xl font-JakartaExtraBold text-gray-900">
-                        {ridesCount}
-                    </Text>
+                    {loading ? (
+                        <Skeleton width={40} height={28} borderRadius={8} />
+                    ) : (
+                        <Text className="text-2xl font-JakartaExtraBold text-gray-900">
+                            {ridesCount}
+                        </Text>
+                    )}
                     <Text className="text-[12px] font-JakartaMedium text-gray-400 mt-1 uppercase tracking-wider">
                         Trips
                     </Text>

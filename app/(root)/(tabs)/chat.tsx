@@ -19,6 +19,8 @@ interface Ride {
   status: string;
 }
 
+import { ChatMessageSkeleton } from "@/components/EarningsSkeleton";
+
 const Chat = () => {
   const { user } = useUser();
   const [activeRide, setActiveRide] = useState<Ride | null>(null);
@@ -40,21 +42,17 @@ const Chat = () => {
     }, [refetch])
   );
 
-  if (loading) {
-    return (
-      <SafeAreaView className="flex-1 bg-white justify-center items-center">
-        <ActivityIndicator size="large" color="#0286FF" />
-      </SafeAreaView>
-    );
-  }
-
   return (
     <SafeAreaView className="flex-1 bg-white">
       <View className="p-4 border-b border-gray-200">
         <Text className="text-xl font-JakartaBold">Messages</Text>
       </View>
 
-      {!activeRide ? (
+      {loading ? (
+        <View className="flex-1">
+          <ChatMessageSkeleton />
+        </View>
+      ) : !activeRide ? (
         <View className="flex-1 justify-center items-center p-5">
           <Image
             source={images.message}
