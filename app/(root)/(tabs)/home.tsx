@@ -11,7 +11,6 @@ import { useFetch } from "@/lib/fetch";
 
 import { useLocationStore } from "@/store";
 import { getSocket } from "@/lib/socket";
-import SideMenu from "@/components/SideMenu";
 import EarningsWidget from "@/components/EarningsWidget";
 import Skeleton from "@/components/Skeleton";
 
@@ -24,7 +23,6 @@ const DriverHome = () => {
     const [location, setLocation] = useState<Location.LocationObject | null>(null);
     const [rideRequest, setRideRequest] = useState<any>(null);
     const [acceptingRide, setAcceptingRide] = useState(false);
-    const [isMenuVisible, setMenuVisible] = useState(false);
     const [isTogglingStatus, setIsTogglingStatus] = useState(false);
 
     const [verificationStatus, setVerificationStatus] = useState<string | null>(null);
@@ -268,18 +266,11 @@ const DriverHome = () => {
 
     return (
         <View className="flex-1 bg-white">
-            <SideMenu isVisible={isMenuVisible} onClose={() => setMenuVisible(false)} />
-
             {/* Header */}
             <View className="absolute top-14 left-0 right-0 z-10 flex-col px-5 pointer-events-none">
                 <View className="flex-row justify-between items-center w-full">
-                    {/* Hamburger Menu */}
-                    <TouchableOpacity
-                        onPress={() => setMenuVisible(true)}
-                        className="bg-white p-3 rounded-full shadow-md pointer-events-auto"
-                    >
-                        <Image source={icons.list} className="w-6 h-6" resizeMode="contain" tintColor="black" />
-                    </TouchableOpacity>
+                    {/* Empty View to maintain center alignment for toggle */}
+                    <View className="w-12 h-12" />
 
                     {/* Online Toggle (Centered Button) */}
                     {isInitializingLocation ? (
