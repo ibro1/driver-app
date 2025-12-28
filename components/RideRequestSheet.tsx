@@ -2,6 +2,7 @@ import React, { useMemo, useRef, useEffect, useState } from "react";
 import { View, Text, TouchableOpacity, Animated } from "react-native";
 import { BottomSheetModal, BottomSheetView } from "@gorhom/bottom-sheet";
 import { Ionicons } from "@expo/vector-icons";
+import { playRideRequestAlert, stopRideRequestAlert } from "@/lib/ride-alert";
 
 interface RideRequestSheetProps {
     request: {
@@ -22,7 +23,7 @@ interface RideRequestSheetProps {
     declineLoading?: boolean;
 }
 
-const TIMEOUT_SECONDS = 30;
+const TIMEOUT_SECONDS = 45; // Industry standard: 45 seconds for emerging markets
 
 const RideRequestSheet = ({ request, onAccept, onDecline, loading, declineLoading }: RideRequestSheetProps) => {
     const bottomSheetModalRef = useRef<BottomSheetModal>(null);
@@ -42,6 +43,18 @@ const RideRequestSheet = ({ request, onAccept, onDecline, loading, declineLoadin
         return () => pulse.stop();
     }, []);
 
+    // Sound + Vibration Alert
+    useEffect(() => {
+        if (request) {
+            playRideRequestAlert();
+        } else {
+            stopRideRequestAlert();
+        }
+        return () => {
+            stopRideRequestAlert();
+        };
+    }, [request]);
+
     // Countdown timer
     useEffect(() => {
         if (!request) {
@@ -53,6 +66,7 @@ const RideRequestSheet = ({ request, onAccept, onDecline, loading, declineLoadin
             setCountdown((prev) => {
                 if (prev <= 1) {
                     clearInterval(interval);
+                    stopRideRequestAlert();
                     onDecline(); // Auto-decline when time runs out
                     return 0;
                 }
