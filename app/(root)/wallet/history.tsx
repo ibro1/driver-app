@@ -30,33 +30,40 @@ const PayoutHistory = () => {
 
     const getStatusColor = (status: string) => {
         switch (status.toLowerCase()) {
-            case 'success': return 'text-green-600 bg-green-100';
-            case 'pending': return 'text-yellow-600 bg-yellow-100';
-            case 'failed': return 'text-red-600 bg-red-100';
-            default: return 'text-neutral-500 bg-neutral-100';
+            case 'success': return 'text-[#9D00FF] bg-purple-50';
+            case 'pending': return 'text-yellow-600 bg-yellow-50';
+            case 'failed': return 'text-red-600 bg-red-50';
+            default: return 'text-neutral-500 bg-neutral-50';
         }
     };
 
     return (
         <SafeAreaView className="flex-1 bg-white">
-            <View className="flex-row items-center px-5 py-4 border-b border-neutral-100">
+            <View className="flex flex-row items-center justify-start px-5 py-6 bg-white shadow-sm z-10 border-b border-neutral-50">
                 <TouchableOpacity onPress={() => router.back()}>
-                    <Image source={icons.backArrow} className="w-6 h-6" resizeMode="contain" />
+                    <View className="w-10 h-10 bg-neutral-100 rounded-full items-center justify-center">
+                        <Image
+                            source={icons.backArrow}
+                            resizeMode="contain"
+                            className="w-6 h-6"
+                        />
+                    </View>
                 </TouchableOpacity>
-                <Text className="text-xl font-JakartaBold text-neutral-800 ml-4">Payout History</Text>
+                <Text className="text-xl font-JakartaBold ml-5">Payout History</Text>
             </View>
 
             {loading ? (
                 <View className="flex-1 justify-center items-center">
-                    <ActivityIndicator size="large" color="#059669" />
+                    <ActivityIndicator size="large" color="#9D00FF" />
                 </View>
             ) : (
                 <FlatList
                     data={transactions}
                     keyExtractor={(item) => item.id.toString()}
-                    contentContainerStyle={{ padding: 20 }}
+                    contentContainerStyle={{ padding: 20, paddingBottom: 100 }}
+                    showsVerticalScrollIndicator={false}
                     refreshControl={
-                        <RefreshControl refreshing={loading} onRefresh={refetch} colors={["#059669"]} />
+                        <RefreshControl refreshing={loading} onRefresh={refetch} colors={["#9D00FF"]} />
                     }
                     ListEmptyComponent={() => (
                         <View className="items-center py-10">

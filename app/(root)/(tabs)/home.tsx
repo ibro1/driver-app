@@ -8,6 +8,7 @@ import { updateDriverStatus, updateDriverLocation, getDriverProfile, acceptRide,
 import RideRequestSheet from "@/components/RideRequestSheet";
 import { router } from "expo-router";
 import { useFetch } from "@/lib/fetch";
+import { stopRideRequestAlert } from "@/lib/ride-alert";
 
 import { useLocationStore } from "@/store";
 import { getSocket } from "@/lib/socket";
@@ -28,6 +29,11 @@ const DriverHome = () => {
     const [verificationStatus, setVerificationStatus] = useState<string | null>(null);
 
     const { data: earningsData, loading: earningsLoading, refetch: refetchEarnings } = useFetch<any>(`/api/driver/${user?.id}/earnings`);
+
+    // Clean up any orphaned audio on mount
+    useEffect(() => {
+        stopRideRequestAlert();
+    }, []);
 
     useEffect(() => {
         const requestLocation = async () => {

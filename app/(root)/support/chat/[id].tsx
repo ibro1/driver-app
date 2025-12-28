@@ -176,25 +176,25 @@ const SupportChat = () => {
         return (
             <View className={`my-2 flex-row ${isUser ? "justify-end" : "justify-start"}`}>
                 {!isUser && (
-                    <View className={`w-8 h-8 rounded-full items-center justify-center mr-2 ${isBot ? "bg-purple-100" : "bg-neutral-200"}`}>
+                    <View className={`w-8 h-8 rounded-full items-center justify-center mr-2 ${isBot ? "bg-[#9D00FF]/10" : "bg-neutral-100"}`}>
                         {isBot ? (
-                            <Text className="text-xs font-bold text-purple-600">AI</Text>
+                            <Text className="text-[10px] font-JakartaBold text-[#9D00FF]">AI</Text>
                         ) : (
-                            <Image source={icons.person} className="w-4 h-4" resizeMode="contain" tintColor="#555" />
+                            <Image source={icons.person} className="w-4 h-4" resizeMode="contain" tintColor="#A1A1A1" />
                         )}
                     </View>
                 )}
 
                 <View
                     className={`max-w-[75%] px-4 py-3 rounded-2xl ${isUser
-                        ? "bg-[#0286FF] rounded-br-none"
+                        ? "bg-[#9D00FF] rounded-br-none shadow-sm shadow-purple-100"
                         : "bg-neutral-100 rounded-bl-none"
                         }`}
                 >
-                    <Text className={`text-base ${isUser ? "text-white" : "text-neutral-800"}`}>
+                    <Text className={`text-base font-JakartaMedium ${isUser ? "text-white" : "text-neutral-800"}`}>
                         {item.content}
                     </Text>
-                    <Text className={`text-[10px] mt-1 ${isUser ? "text-blue-100" : "text-neutral-400"} text-right`}>
+                    <Text className={`text-[10px] mt-1.5 ${isUser ? "text-purple-100" : "text-neutral-400"} text-right font-JakartaMedium`}>
                         {new Date(item.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </Text>
                 </View>
@@ -204,7 +204,7 @@ const SupportChat = () => {
 
     return (
         <SafeAreaView className="flex-1 bg-white">
-            <View className="flex flex-row items-center justify-between px-5 py-4 bg-white shadow-sm z-10">
+            <View className="flex flex-row items-center justify-between px-5 py-4 bg-white shadow-sm z-10 border-b border-neutral-50">
                 <View className="flex-row items-center">
                     <TouchableOpacity onPress={() => router.back()}>
                         <View className="w-10 h-10 bg-neutral-100 rounded-full items-center justify-center">
@@ -216,21 +216,21 @@ const SupportChat = () => {
                         </View>
                     </TouchableOpacity>
                     <View className="ml-5">
-                        <Text className="text-xl font-JakartaSemiBold">Support Chat</Text>
-                        <Text className="text-xs text-neutral-500">Ticket #{id}</Text>
+                        <Text className="text-lg font-JakartaBold text-neutral-900">Support Chat</Text>
+                        <Text className="text-xs text-neutral-400 font-JakartaMedium">Ticket #{id}</Text>
                     </View>
                 </View>
 
                 {ticketStatus !== 'closed' && ticketStatus !== 'resolved' && (
-                    <TouchableOpacity onPress={handleResolve} className="bg-green-100 px-3 py-1 rounded-full">
-                        <Text className="text-green-700 font-JakartaMedium text-xs">Resolve</Text>
+                    <TouchableOpacity onPress={handleResolve} className="bg-[#9D00FF]/10 px-4 py-1.5 rounded-full border border-[#9D00FF]/20">
+                        <Text className="text-[#9D00FF] font-JakartaBold text-xs">Resolve</Text>
                     </TouchableOpacity>
                 )}
             </View>
 
             {loading && messages.length === 0 ? (
                 <View className="flex-1 justify-center items-center">
-                    <ActivityIndicator size="large" color="#0286FF" />
+                    <ActivityIndicator size="large" color="#9D00FF" />
                 </View>
             ) : (
                 <FlatList
@@ -238,11 +238,12 @@ const SupportChat = () => {
                     data={messages}
                     keyExtractor={(item) => item.id.toString()}
                     renderItem={renderMessage}
-                    contentContainerStyle={{ padding: 20, paddingBottom: 100 }}
+                    contentContainerStyle={{ padding: 20, paddingBottom: 120 }}
                     onContentSizeChange={() => flatListRef.current?.scrollToEnd()}
+                    showsVerticalScrollIndicator={false}
                     ListEmptyComponent={
                         <View className="flex-1 items-center justify-center mt-10">
-                            <Text className="text-neutral-400">No messages yet. Type below to start.</Text>
+                            <Text className="text-neutral-400 font-JakartaMedium text-sm">No messages yet. Type below to start.</Text>
                         </View>
                     }
                 />
@@ -250,13 +251,14 @@ const SupportChat = () => {
 
             <KeyboardAvoidingView
                 behavior={Platform.OS === "ios" ? "padding" : "height"}
-                className="absolute bottom-0 w-full bg-white border-t border-neutral-100 px-4 py-3"
+                className="absolute bottom-0 w-full bg-white border-t border-neutral-100 px-4 py-4"
+                keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 0}
             >
-                <View className="flex-row items-center bg-neutral-50 rounded-full px-4 border border-neutral-200">
+                <View className="flex-row items-center bg-neutral-50 rounded-2xl px-4 border border-neutral-200">
                     <TextInput
                         className="flex-1 py-3 text-base font-JakartaMedium text-neutral-800 max-h-24"
-                        placeholder="Type a message..."
-                        placeholderTextColor="#9CA3AF"
+                        placeholder="Type your message..."
+                        placeholderTextColor="#A3A3A3"
                         value={inputText}
                         onChangeText={setInputText}
                         multiline
@@ -264,9 +266,9 @@ const SupportChat = () => {
                     <TouchableOpacity
                         onPress={handleSend}
                         disabled={!inputText.trim() || sending}
-                        className={`ml-2 p-2 rounded-full ${!inputText.trim() ? "opacity-50" : ""}`}
+                        className={`ml-2 p-2 rounded-full ${!inputText.trim() ? "opacity-30" : ""}`}
                     >
-                        <Image source={icons.arrowDown} className="w-6 h-6 -rotate-90" tintColor="#0286FF" resizeMode="contain" />
+                        <Image source={icons.arrowDown} className="w-6 h-6 -rotate-90" tintColor="#9D00FF" resizeMode="contain" />
                     </TouchableOpacity>
                 </View>
             </KeyboardAvoidingView>

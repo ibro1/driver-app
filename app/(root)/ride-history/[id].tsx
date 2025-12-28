@@ -128,31 +128,31 @@ const DriverRideHistoryDetails = () => {
 
                 {/* Route Details Section */}
                 <Text className="text-lg font-JakartaBold mb-3 text-gray-900">Route Map</Text>
-                <View className="bg-gray-50/50 p-6 rounded-3xl mb-6 border border-gray-100 overflow-hidden">
+                <View className="bg-neutral-50 p-6 rounded-3xl mb-6 border border-neutral-100 overflow-hidden">
                     {/* Vertical Line Container */}
                     <View className="relative">
                         {/* Pickup */}
                         <View className="flex-row items-start mb-8 relative z-10">
                             <View className="items-center mr-5 mt-1">
-                                <View className="w-4 h-4 rounded-full border-[3px] border-emerald-500 bg-white shadow-sm" />
+                                <View className="w-4 h-4 rounded-full border-[3px] border-[#9D00FF] bg-white shadow-sm" />
                             </View>
                             <View className="flex-1">
-                                <Text className="text-[10px] font-JakartaBold text-gray-400 uppercase tracking-[2px] mb-1.5 leading-tight">Pickup Point</Text>
-                                <Text className="text-[15px] font-JakartaSemiBold text-gray-900 leading-snug">{ride.origin_address}</Text>
+                                <Text className="text-[10px] font-JakartaBold text-neutral-400 uppercase tracking-[2px] mb-1.5 leading-tight">Pickup Point</Text>
+                                <Text className="text-[15px] font-JakartaSemiBold text-neutral-900 leading-snug">{ride.origin_address}</Text>
                             </View>
                         </View>
 
                         {/* Dashed Tracking Line */}
-                        <View className="absolute left-[7.5px] top-[24px] w-[1px] h-[58px] border-l border-dashed border-gray-300 z-0" />
+                        <View className="absolute left-[7.5px] top-[24px] w-[1px] h-[58px] border-l border-dashed border-neutral-200 z-0" />
 
                         {/* Dropoff */}
                         <View className="flex-row items-start relative z-10">
                             <View className="items-center mr-5 mt-1">
-                                <View className="w-4 h-4 rounded-sm bg-emerald-600 shadow-sm" />
+                                <View className="w-4 h-4 rounded-sm bg-[#9D00FF] shadow-sm" />
                             </View>
                             <View className="flex-1">
-                                <Text className="text-[10px] font-JakartaBold text-gray-400 uppercase tracking-[2px] mb-1.5 leading-tight">Dropoff Destination</Text>
-                                <Text className="text-[15px] font-JakartaSemiBold text-gray-900 leading-snug">{ride.destination_address}</Text>
+                                <Text className="text-[10px] font-JakartaBold text-neutral-400 uppercase tracking-[2px] mb-1.5 leading-tight">Dropoff Destination</Text>
+                                <Text className="text-[15px] font-JakartaSemiBold text-neutral-900 leading-snug">{ride.destination_address}</Text>
                             </View>
                         </View>
                     </View>
@@ -160,14 +160,14 @@ const DriverRideHistoryDetails = () => {
 
                 {/* Secure Payment Summary */}
                 <Text className="text-lg font-JakartaBold mb-3 text-gray-900">Billing Detail</Text>
-                <View className="bg-gray-50/80 p-5 rounded-2xl mb-6 border border-gray-100">
+                <View className="bg-neutral-50 p-5 rounded-2xl mb-6 border border-neutral-100">
                     <View className="flex-row items-center justify-between">
                         <View className="flex-row items-center gap-3">
-                            <View className={`w-2 h-2 rounded-full ${ride.payment_status === 'paid' ? 'bg-emerald-500' : 'bg-red-500'}`} />
-                            <Text className="text-gray-600 font-JakartaMedium">Income Status</Text>
+                            <View className={`w-2 h-2 rounded-full ${ride.payment_status === 'paid' ? 'bg-[#9D00FF]' : 'bg-red-500'}`} />
+                            <Text className="text-neutral-600 font-JakartaMedium">Income Status</Text>
                         </View>
-                        <View className={`px-4 py-1.5 rounded-full ${ride.payment_status === 'paid' ? 'bg-emerald-50' : 'bg-red-50'}`}>
-                            <Text className={`text-xs capitalize font-JakartaExtraBold ${ride.payment_status === 'paid' ? 'text-emerald-700' : 'text-red-700'}`}>
+                        <View className={`px-4 py-1.5 rounded-full ${ride.payment_status === 'paid' ? 'bg-[#9D00FF]/10' : 'bg-red-50'}`}>
+                            <Text className={`text-xs capitalize font-JakartaExtraBold ${ride.payment_status === 'paid' ? 'text-[#9D00FF]' : 'text-red-700'}`}>
                                 {ride.payment_status}
                             </Text>
                         </View>
@@ -175,56 +175,56 @@ const DriverRideHistoryDetails = () => {
                 </View>
 
                 {/* Rider Info (For Driver) */}
-                <Text className="text-lg font-JakartaBold mb-3">Rider</Text>
-                <View className="flex-row items-center bg-gray-50 p-4 rounded-xl mb-5">
+                <Text className="text-lg font-JakartaBold mb-3 text-gray-900">Rider</Text>
+                <View className="flex-row items-center bg-neutral-50 p-4 rounded-xl mb-5 border border-neutral-100">
                     {ride.rider?.image && ride.rider.image !== "null" ? (
                         <Image source={{ uri: ride.rider.image }} className="w-14 h-14 rounded-full mr-4" />
                     ) : (
-                        <View className="w-14 h-14 bg-gray-200 rounded-full mr-4 items-center justify-center">
-                            <Image source={icons.person} className="w-8 h-8 text-gray-500" resizeMode="contain" />
+                        <View className="w-14 h-14 bg-neutral-200 rounded-full mr-4 items-center justify-center">
+                            <Image source={icons.person} className="w-8 h-8 text-neutral-500" resizeMode="contain" />
                         </View>
                     )}
 
                     <View className="flex-1">
-                        <Text className="text-lg font-JakartaSemiBold">{ride.rider?.name || "Rider"}</Text>
+                        <Text className="text-lg font-JakartaSemiBold text-neutral-900">{ride.rider?.name || "Rider"}</Text>
                         <View className="flex-row items-center gap-1">
-                            <Image source={icons.star} className="w-4 h-4" />
-                            <Text className="text-gray-500">{(ride.rider?.rating_count || 0) > 0 ? ride.rider?.rating : "New"}</Text>
+                            <Image source={icons.star} className={`w-4 h-4 ${(ride.rider?.rating_count || 0) > 0 ? 'text-amber-400' : 'text-neutral-300'}`} />
+                            <Text className="text-neutral-500 font-JakartaMedium">{(ride.rider?.rating_count || 0) > 0 ? ride.rider?.rating : "New"}</Text>
                         </View>
                     </View>
                 </View>
 
                 {/* Earnings Breakdown (For Driver) */}
-                <Text className="text-lg font-JakartaBold mb-3">Earnings Breakdown</Text>
-                <View className="bg-gray-50 p-4 rounded-xl mb-5">
+                <Text className="text-lg font-JakartaBold mb-3 text-gray-900">Earnings Breakdown</Text>
+                <View className="bg-neutral-50 p-4 rounded-xl mb-5 border border-neutral-100">
                     <View className="flex-row justify-between mb-2">
-                        <Text className="text-gray-500">Gross Fare</Text>
-                        <Text className="font-JakartaMedium">₦{ride.fare_price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</Text>
+                        <Text className="text-neutral-500 font-JakartaMedium">Gross Fare</Text>
+                        <Text className="font-JakartaBold text-neutral-900">₦{ride.fare_price.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</Text>
                     </View>
                     <View className="flex-row justify-between mb-2">
-                        <Text className="text-gray-500">App Commission</Text>
-                        <Text className="font-JakartaMedium text-red-500">- ₦{(ride.fare_price * 0.1).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</Text>
+                        <Text className="text-neutral-500 font-JakartaMedium">App Commission (10%)</Text>
+                        <Text className="font-JakartaBold text-red-500">- ₦{(ride.fare_price * 0.1).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</Text>
                     </View>
-                    <View className="w-full h-[1px] bg-gray-200 my-2" />
+                    <View className="w-full h-[1px] bg-neutral-200 my-2" />
                     <View className="flex-row justify-between">
-                        <Text className="text-lg font-JakartaBold">Net Earnings</Text>
-                        <Text className="text-lg font-JakartaExtraBold text-[#0CC25F]">₦{(ride.fare_price * 0.9).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</Text>
+                        <Text className="text-lg font-JakartaBold text-neutral-900">Net Earnings</Text>
+                        <Text className="text-lg font-JakartaExtraBold text-[#9D00FF]">₦{(ride.fare_price * 0.9).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</Text>
                     </View>
                 </View>
 
                 {/* Actions */}
                 <View className="flex-row gap-4 mb-10">
                     <TouchableOpacity
-                        className="flex-1 bg-general-100 py-4 rounded-full items-center"
+                        className="flex-1 bg-neutral-100 py-4 rounded-full items-center border border-neutral-200"
                         onPress={() => router.push("/(root)/support" as any)}
                     >
-                        <Text className="font-JakartaBold text-gray-900">Report Issue</Text>
+                        <Text className="font-JakartaBold text-neutral-900">Report Issue</Text>
                     </TouchableOpacity>
 
                     {/* Rate Rider Button (Only if not rated) */}
                     {!ride.user_rating && (
                         <TouchableOpacity
-                            className="flex-1 bg-[#0286FF] py-4 rounded-full items-center"
+                            className="flex-1 bg-[#9D00FF] py-4 rounded-full items-center shadow-lg shadow-purple-200"
                             onPress={() => {
                                 setSelectedRating(0);
                                 setModalVisible(true);
@@ -234,8 +234,8 @@ const DriverRideHistoryDetails = () => {
                         </TouchableOpacity>
                     )}
                     {ride.user_rating && (
-                        <View className="flex-1 bg-green-100 py-4 rounded-full items-center">
-                            <Text className="font-JakartaBold text-green-700">Rated: {ride.user_rating} ★</Text>
+                        <View className="flex-1 bg-[#9D00FF]/10 py-4 rounded-full items-center">
+                            <Text className="font-JakartaBold text-[#9D00FF]">Rated: {ride.user_rating} ★</Text>
                         </View>
                     )}
                 </View>
@@ -248,16 +248,16 @@ const DriverRideHistoryDetails = () => {
                     onRequestClose={() => setModalVisible(false)}
                 >
                     <View className="flex-1 justify-end bg-black/50">
-                        <View className="bg-white p-5 rounded-t-3xl">
-                            <Text className="text-xl font-JakartaBold mb-5 text-center">Rate {ride.rider?.name || 'Rider'}</Text>
+                        <View className="bg-white p-6 rounded-t-[40px] shadow-2xl">
+                            <Text className="text-xl font-JakartaBold mb-6 text-center text-neutral-900">Rate {ride.rider?.name || 'Rider'}</Text>
 
-                            <View className="flex-row justify-center gap-4 mb-8">
+                            <View className="flex-row justify-center gap-4 mb-10">
                                 {[1, 2, 3, 4, 5].map((star) => (
                                     <TouchableOpacity key={star} onPress={() => setSelectedRating(star)}>
                                         <Image
                                             source={icons.star}
                                             className={`w-12 h-12`}
-                                            style={{ tintColor: selectedRating >= star ? '#FFD700' : '#E0E0E0' }}
+                                            style={{ tintColor: selectedRating >= star ? '#FFD700' : '#F0F0F0' }}
                                             resizeMode="contain"
                                         />
                                     </TouchableOpacity>
@@ -266,17 +266,17 @@ const DriverRideHistoryDetails = () => {
 
                             <TouchableOpacity
                                 onPress={submitRating}
-                                className={`w-full py-4 rounded-full flex-row justify-center items-center ${submitting ? 'bg-gray-300' : 'bg-[#0286FF]'}`}
+                                className={`w-full py-4 rounded-2xl flex-row justify-center items-center ${submitting ? 'bg-neutral-200' : 'bg-[#9D00FF] shadow-lg shadow-purple-200'}`}
                                 disabled={submitting}
                             >
                                 {submitting ? (
                                     <ActivityIndicator color="white" />
                                 ) : (
-                                    <Text className="text-xl text-white font-JakartaBold">Submit Rating</Text>
+                                    <Text className="text-lg text-white font-JakartaBold">Submit Rating</Text>
                                 )}
                             </TouchableOpacity>
-                            <TouchableOpacity onPress={() => setModalVisible(false)} className="mt-4 mb-2">
-                                <Text className="text-center text-gray-500 font-JakartaMedium">Cancel</Text>
+                            <TouchableOpacity onPress={() => setModalVisible(false)} className="mt-5 mb-4">
+                                <Text className="text-center text-neutral-400 font-JakartaMedium">Cancel</Text>
                             </TouchableOpacity>
                         </View>
                     </View>

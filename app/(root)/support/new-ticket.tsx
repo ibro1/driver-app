@@ -66,25 +66,26 @@ const NewTicket = () => {
             </View>
 
             <ScrollView className="px-5 pt-6">
-                <Text className="text-base font-JakartaMedium text-neutral-800 mb-2">Select a Topic</Text>
-                <View className="flex-row flex-wrap gap-2 mb-6">
+                <Text className="text-base font-JakartaBold text-neutral-800 mb-4">Select a Topic</Text>
+                <View className="flex-row flex-wrap gap-3 mb-8">
                     {categories.map((cat) => (
                         <TouchableOpacity
                             key={cat}
                             onPress={() => setSelectedCategory(cat)}
-                            className={`px-4 py-2 rounded-full border ${selectedCategory === cat ? "bg-[#0286FF] border-[#0286FF]" : "bg-white border-neutral-200"}`}
+                            className={`px-5 py-2.5 rounded-full border ${selectedCategory === cat ? "bg-[#9D00FF] border-[#9D00FF]" : "bg-white border-neutral-200 shadow-sm"}`}
                         >
-                            <Text className={`font-JakartaMedium ${selectedCategory === cat ? "text-white" : "text-neutral-600"}`}>
+                            <Text className={`font-JakartaSemiBold text-sm ${selectedCategory === cat ? "text-white" : "text-neutral-500"}`}>
                                 {cat}
                             </Text>
                         </TouchableOpacity>
                     ))}
                 </View>
 
-                <Text className="text-base font-JakartaMedium text-neutral-800 mb-2">How can we help?</Text>
+                <Text className="text-base font-JakartaBold text-neutral-800 mb-4">How can we help?</Text>
                 <TextInput
-                    className="bg-neutral-50 border border-neutral-200 rounded-xl p-4 text-neutral-800 font-JakartaMedium h-40"
-                    placeholder="Describe your issue..."
+                    className="bg-neutral-50 border border-neutral-200 rounded-2xl p-5 text-neutral-800 font-JakartaMedium h-48 shadow-inner"
+                    placeholder="Briefly describe your issue or concern..."
+                    placeholderTextColor="#A3A3A3"
                     textAlignVertical="top"
                     multiline
                     value={message}
@@ -94,7 +95,7 @@ const NewTicket = () => {
                 <TouchableOpacity
                     onPress={handleCreateTicket}
                     disabled={loading}
-                    className={`mt-8 py-4 rounded-full items-center ${loading ? "bg-neutral-300" : "bg-[#0286FF]"}`}
+                    className={`mt-10 py-4 rounded-full items-center shadow-lg ${loading ? "bg-neutral-300" : "bg-[#9D00FF] shadow-purple-200"}`}
                 >
                     <Text className="text-white font-JakartaBold text-lg">
                         {loading ? "Starting Chat..." : "Start Chat"}

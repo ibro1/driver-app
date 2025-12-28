@@ -170,61 +170,65 @@ const EditProfile = () => {
                     <Text className="text-2xl font-JakartaBold">Edit Profile</Text>
                 </View>
 
-                <View className="items-center mb-6">
+                <View className="items-center mb-10">
                     <View className="relative">
                         <Image
                             source={form.profileImageUrl ? { uri: form.profileImageUrl } : icons.profile}
-                            className="w-24 h-24 rounded-full border-4 border-white shadow-sm bg-neutral-100"
+                            className="w-28 h-28 rounded-full border-4 border-white shadow-xl bg-neutral-100"
                         />
                         <TouchableOpacity
                             onPress={handlePickImage}
                             disabled={uploading}
-                            className="absolute bottom-0 right-0 bg-[#0286FF] p-2 rounded-full border-2 border-white"
+                            className="absolute bottom-1 right-1 bg-[#9D00FF] p-2.5 rounded-full border-4 border-white shadow-md"
                         >
                             <Image source={icons.point} className="w-4 h-4" tintColor="white" resizeMode="contain" />
                         </TouchableOpacity>
                     </View>
-                    <Text className="text-sm font-JakartaMedium text-[#0286FF] mt-2">
-                        {uploading ? "Uploading..." : "Change Photo"}
-                    </Text>
+                    <TouchableOpacity onPress={handlePickImage} disabled={uploading}>
+                        <Text className="text-sm font-JakartaBold text-[#9D00FF] mt-4">
+                            {uploading ? "Uploading..." : "Change Photo"}
+                        </Text>
+                    </TouchableOpacity>
                 </View>
 
-                <InputField
-                    label="First Name"
-                    placeholder="Enter first name"
-                    value={form.firstName}
-                    onChangeText={(text) => setForm({ ...form, firstName: text })}
-                    editable={!isSubmitting}
-                />
+                <View className="gap-5">
+                    <InputField
+                        label="First Name"
+                        placeholder="Enter your first name"
+                        value={form.firstName}
+                        onChangeText={(text) => setForm({ ...form, firstName: text })}
+                        editable={!isSubmitting}
+                    />
 
-                <InputField
-                    label="Last Name"
-                    placeholder="Enter last name"
-                    value={form.lastName}
-                    onChangeText={(text) => setForm({ ...form, lastName: text })}
-                    editable={!isSubmitting}
-                />
+                    <InputField
+                        label="Last Name"
+                        placeholder="Enter your last name"
+                        value={form.lastName}
+                        onChangeText={(text) => setForm({ ...form, lastName: text })}
+                        editable={!isSubmitting}
+                    />
 
-                <InputField
-                    label="Email"
-                    placeholder="Email address"
-                    value={form.email}
-                    editable={false}
-                    containerStyle="bg-neutral-100 opacity-50"
-                />
+                    <InputField
+                        label="Email Address"
+                        placeholder="email@example.com"
+                        value={form.email}
+                        editable={false}
+                        containerStyle="bg-neutral-50 opacity-60 border-neutral-100"
+                    />
 
-                <InputField
-                    label="Phone Number"
-                    placeholder="Enter phone number"
-                    value={form.phone}
-                    editable={false}
-                    containerStyle="bg-neutral-100 opacity-50"
-                />
+                    <InputField
+                        label="Phone Number"
+                        placeholder="+234..."
+                        value={form.phone}
+                        editable={false}
+                        containerStyle="bg-neutral-50 opacity-60 border-neutral-100"
+                    />
+                </View>
 
                 <CustomButton
                     title="Save Changes"
                     onPress={handleUpdate}
-                    className="mt-6"
+                    className="mt-12 shadow-lg shadow-purple-200"
                     isLoading={isSubmitting || uploading}
                 />
             </ScrollView>

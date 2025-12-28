@@ -114,8 +114,8 @@ const AddBank = () => {
                     </View>
                 ) : currentBank && !showForm ? (
                     <View className="items-center mt-4">
-                        <View className="w-20 h-20 bg-green-100 rounded-full items-center justify-center mb-4">
-                            <Image source={icons.checkmark} className="w-10 h-10 tint-green-600" resizeMode="contain" />
+                        <View className="w-20 h-20 bg-purple-100 rounded-full items-center justify-center mb-4">
+                            <Image source={icons.checkmark} className="w-10 h-10 tint-[#9D00FF]" style={{ tintColor: '#9D00FF' }} resizeMode="contain" />
                         </View>
                         <Text className="text-xl font-JakartaBold text-neutral-800">{currentBank.bankName}</Text>
                         <Text className="text-3xl font-JakartaExtraBold text-neutral-900 my-2">{currentBank.accountNumber}</Text>
@@ -142,7 +142,7 @@ const AddBank = () => {
                         <Text className="text-base font-JakartaMedium text-neutral-500 mb-2">Select Bank</Text>
                         <TouchableOpacity
                             onPress={() => setModalVisible(true)}
-                            className="flex-row justify-between items-center bg-neutral-50 border border-neutral-200 p-4 rounded-xl mb-6"
+                            className="flex-row justify-between items-center bg-neutral-50 border border-neutral-200 p-4 rounded-xl mb-6 shadow-sm"
                         >
                             <Text className={`text-base font-JakartaMedium ${selectedBank ? 'text-neutral-800' : 'text-neutral-400'}`}>
                                 {selectedBank?.name || "Choose a bank"}
@@ -152,7 +152,7 @@ const AddBank = () => {
 
                         <Text className="text-base font-JakartaMedium text-neutral-500 mb-2">Account Number</Text>
                         <TextInput
-                            className="bg-neutral-50 border border-neutral-200 p-4 rounded-xl text-xl font-JakartaBold text-neutral-800 mb-6"
+                            className="bg-neutral-50 border border-neutral-200 p-4 rounded-xl text-xl font-JakartaBold text-neutral-800 mb-6 shadow-sn"
                             placeholder="0123456789"
                             keyboardType="numeric"
                             maxLength={10}
@@ -162,19 +162,19 @@ const AddBank = () => {
 
                         {resolving && (
                             <View className="flex-row items-center justify-center mb-6">
-                                <ActivityIndicator size="small" color="#059669" />
+                                <ActivityIndicator size="small" color="#9D00FF" />
                                 <Text className="text-neutral-500 ml-2 font-JakartaMedium">Verifying account...</Text>
                             </View>
                         )}
 
                         {resolvedName ? (
-                            <View className="bg-green-50 border border-green-200 p-4 rounded-xl mb-6 flex-row items-center">
-                                <View className="w-8 h-8 bg-green-100 rounded-full items-center justify-center mr-3">
-                                    <Image source={icons.checkmark} className="w-4 h-4 tint-green-600" resizeMode="contain" />
+                            <View className="bg-purple-50 border border-purple-100 p-4 rounded-xl mb-6 flex-row items-center shadow-sm">
+                                <View className="w-8 h-8 bg-purple-100 rounded-full items-center justify-center mr-3">
+                                    <Image source={icons.checkmark} className="w-4 h-4" style={{ tintColor: '#9D00FF' }} resizeMode="contain" />
                                 </View>
                                 <View>
-                                    <Text className="text-xs text-green-600 font-JakartaBold uppercase">Account Verified</Text>
-                                    <Text className="text-lg font-JakartaBold text-green-800">{resolvedName}</Text>
+                                    <Text className="text-xs text-[#9D00FF] font-JakartaBold uppercase tracking-wider">Account Verified</Text>
+                                    <Text className="text-lg font-JakartaBold text-purple-900">{resolvedName}</Text>
                                 </View>
                             </View>
                         ) : null}
@@ -182,7 +182,7 @@ const AddBank = () => {
                         <TouchableOpacity
                             onPress={handleSave}
                             disabled={!resolvedName || saving}
-                            className={`w-full py-4 rounded-full items-center mt-4 ${(!resolvedName || saving) ? 'bg-neutral-300' : 'bg-emerald-600'}`}
+                            className={`w-full py-4 rounded-full items-center mt-4 shadow-lg ${(!resolvedName || saving) ? 'bg-neutral-300' : 'bg-[#9D00FF] shadow-purple-200'}`}
                         >
                             {saving ? (
                                 <ActivityIndicator color="white" />

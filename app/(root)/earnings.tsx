@@ -40,15 +40,16 @@ const Earnings = () => {
         data={listData}
         keyExtractor={(item, index) => loading ? `skeleton-${index}` : (item.rideId?.toString() || Math.random().toString())}
         contentContainerStyle={{ padding: 20, paddingBottom: 100 }}
+        showsVerticalScrollIndicator={false}
         ListHeaderComponent={() => (
           <View className="mb-6">
-            {/* Summary Card - Premium Emerald Look */}
-            <View className="bg-emerald-600 rounded-[36px] p-8 shadow-2xl shadow-emerald-200 overflow-hidden relative">
+            {/* Summary Card - Premium KarRide Purple Look */}
+            <View className="bg-[#9D00FF] rounded-[36px] p-8 shadow-2xl shadow-purple-200 overflow-hidden relative">
               {/* Decorative Pattern / Glass Glow */}
               <View className="absolute -top-12 -right-12 w-48 h-48 bg-white/20 rounded-full blur-3xl" />
-              <View className="absolute -bottom-10 -left-10 w-32 h-32 bg-emerald-400/20 rounded-full blur-2xl" />
+              <View className="absolute -bottom-10 -left-10 w-32 h-32 bg-purple-400/20 rounded-full blur-2xl" />
 
-              <Text className="text-emerald-100 text-xs font-JakartaBold mb-1 uppercase tracking-widest">Available Balance</Text>
+              <Text className="text-purple-100 text-[10px] font-JakartaBold mb-1 uppercase tracking-[2px]">Available Balance</Text>
 
               {loading ? (
                 <View className="mb-8 mt-2">
@@ -62,7 +63,7 @@ const Earnings = () => {
 
               <View className="flex-row gap-4 mb-8">
                 <View className="flex-1 bg-white/10 rounded-[24px] p-4 border border-white/20">
-                  <Text className="text-emerald-100 text-[10px] font-JakartaBold uppercase tracking-tighter mb-1">Today</Text>
+                  <Text className="text-purple-50 text-[10px] font-JakartaBold uppercase tracking-tighter mb-1">Today</Text>
                   {loading ? (
                     <Skeleton width={80} height={20} borderRadius={6} style={{ backgroundColor: "#ffffff20", opacity: 0.5 }} />
                   ) : (
@@ -72,7 +73,7 @@ const Earnings = () => {
                   )}
                 </View>
                 <View className="flex-1 bg-white/10 rounded-[24px] p-4 border border-white/20">
-                  <Text className="text-emerald-100 text-[10px] font-JakartaBold uppercase tracking-tighter mb-1">Trips</Text>
+                  <Text className="text-purple-50 text-[10px] font-JakartaBold uppercase tracking-tighter mb-1">Trips</Text>
                   {loading ? (
                     <Skeleton width={40} height={20} borderRadius={6} style={{ backgroundColor: "#ffffff20", opacity: 0.5 }} />
                   ) : (
@@ -86,14 +87,14 @@ const Earnings = () => {
               <View className="flex-row gap-4">
                 <TouchableOpacity
                   onPress={() => router.push("/(root)/wallet/withdraw" as any)}
-                  className="flex-1 bg-white py-4 rounded-2xl items-center shadow-lg shadow-emerald-900/10"
+                  className="flex-1 bg-white py-4 rounded-2xl items-center shadow-lg shadow-purple-900/10"
                 >
-                  <Text className="text-emerald-600 font-JakartaBold text-lg">Cash Out</Text>
+                  <Text className="text-[#9D00FF] font-JakartaBold text-lg">Cash Out</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
                   onPress={() => router.push("/(root)/wallet/add-bank")}
-                  className="flex-1 bg-emerald-500 py-4 rounded-2xl items-center border border-emerald-400"
+                  className="flex-1 bg-[#9D00FF]/10 py-4 rounded-2xl items-center border border-white/20"
                 >
                   <Text className="text-white font-JakartaBold text-lg">Bank Info</Text>
                 </TouchableOpacity>
@@ -101,10 +102,10 @@ const Earnings = () => {
             </View>
 
             <View className="mt-10 flex-row items-center justify-between mb-4 px-1">
-              <Text className="text-2xl font-JakartaExtraBold text-gray-900">Recent Trips</Text>
+              <Text className="text-2xl font-JakartaExtraBold text-neutral-900">Recent Trips</Text>
               {!loading && (
                 <TouchableOpacity onPress={() => router.push("/(tabs)/rides")}>
-                  <Text className="text-sm font-JakartaBold text-emerald-600">See All</Text>
+                  <Text className="text-sm font-JakartaBold text-[#9D00FF]">See All</Text>
                 </TouchableOpacity>
               )}
             </View>
@@ -116,28 +117,27 @@ const Earnings = () => {
           <TouchableOpacity
             activeOpacity={0.7}
             onPress={() => router.push(`/(root)/ride-history/${item.rideId}` as any)}
-            style={{ elevation: 5 }}
-            className="flex-row items-center bg-white p-5 rounded-[24px] mb-4 shadow-xl shadow-neutral-300/50 border border-gray-100"
+            className="flex-row items-center bg-white p-5 rounded-[24px] mb-4 shadow-sm border border-neutral-100"
           >
-            <View className="w-12 h-12 rounded-2xl bg-emerald-50 items-center justify-center mr-4">
-              <Image source={icons.to} className="w-5 h-5" tintColor="#10b981" />
+            <View className="w-12 h-12 rounded-2xl bg-purple-50 items-center justify-center mr-4">
+              <Image source={icons.to} className="w-5 h-5" tintColor="#9D00FF" />
             </View>
 
             <View className="flex-1">
-              <Text className="text-[15px] font-JakartaBold text-gray-900 mb-0.5" numberOfLines={1}>
+              <Text className="text-[15px] font-JakartaBold text-neutral-900 mb-0.5" numberOfLines={1}>
                 Ride #{item.rideId}
               </Text>
-              <Text className="text-xs font-JakartaMedium text-gray-400">
+              <Text className="text-xs font-JakartaMedium text-neutral-400">
                 {formatDate(item.createdAt)}
               </Text>
             </View>
 
             <View className="items-end">
-              <Text className="text-lg font-JakartaExtraBold text-emerald-600">
+              <Text className="text-lg font-JakartaExtraBold text-[#9D00FF]">
                 +₦{(item.driverPayout ?? item.farePrice ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </Text>
-              <View className="bg-emerald-50 px-2 py-0.5 rounded-lg mt-1 border border-emerald-100">
-                <Text className="text-[9px] font-JakartaBold text-emerald-600 uppercase tracking-widest">
+              <View className="bg-purple-50 px-2.5 py-1 rounded-lg mt-1 border border-purple-100">
+                <Text className="text-[9px] font-JakartaExtraBold text-[#9D00FF] uppercase tracking-widest">
                   Earned
                 </Text>
               </View>

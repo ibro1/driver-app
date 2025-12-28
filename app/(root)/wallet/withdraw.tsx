@@ -119,23 +119,23 @@ const Withdraw = () => {
                             </View>
                         </View>
                         <TouchableOpacity onPress={() => router.push("/(root)/wallet/add-bank")}>
-                            <Text className="text-emerald-600 font-JakartaBold">Change</Text>
+                            <Text className="text-[#9D00FF] font-JakartaBold">Change</Text>
                         </TouchableOpacity>
                     </View>
                 ) : (
                     <TouchableOpacity
                         onPress={() => router.push("/(root)/wallet/add-bank")}
-                        className="p-6 rounded-xl border border-dashed border-emerald-500 bg-emerald-50 items-center justify-center"
+                        className="p-6 rounded-2xl border border-dashed border-[#9D00FF] bg-purple-50 items-center justify-center"
                     >
-                        <Text className="font-JakartaBold text-emerald-600 text-lg mb-1">Add Bank Account</Text>
-                        <Text className="text-emerald-400 text-sm text-center">You need to link a bank account to cash out.</Text>
+                        <Text className="font-JakartaBold text-[#9D00FF] text-lg mb-1">Add Bank Account</Text>
+                        <Text className="text-purple-400 text-sm text-center">You need to link a bank account to cash out.</Text>
                     </TouchableOpacity>
                 )}
 
                 <TouchableOpacity
                     onPress={handleWithdraw}
                     disabled={loading || !amount || !defaultBank}
-                    className={`w-full py-4 rounded-full items-center mt-8 ${loading || !amount || !defaultBank ? 'bg-neutral-300' : 'bg-emerald-600'}`}
+                    className={`w-full py-4 rounded-full items-center mt-10 shadow-lg ${loading || !amount || !defaultBank ? 'bg-neutral-300' : 'bg-[#9D00FF] shadow-purple-200'}`}
                 >
                     {loading ? (
                         <ActivityIndicator color="white" />
@@ -146,9 +146,9 @@ const Withdraw = () => {
 
                 <TouchableOpacity
                     onPress={() => router.push("/(root)/wallet/history")}
-                    className="mt-6 items-center"
+                    className="mt-8 items-center"
                 >
-                    <Text className="text-emerald-600 font-JakartaMedium text-base">View Payout History</Text>
+                    <Text className="text-[#9D00FF] font-JakartaBold text-base">View Payout History</Text>
                 </TouchableOpacity>
             </ScrollView>
         </SafeAreaView>

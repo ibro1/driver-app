@@ -66,8 +66,6 @@ const RideRequestSheet = ({ request, onAccept, onDecline, loading, declineLoadin
             setCountdown((prev) => {
                 if (prev <= 1) {
                     clearInterval(interval);
-                    stopRideRequestAlert();
-                    onDecline(); // Auto-decline when time runs out
                     return 0;
                 }
                 return prev - 1;
@@ -75,6 +73,14 @@ const RideRequestSheet = ({ request, onAccept, onDecline, loading, declineLoadin
         }, 1000);
         return () => clearInterval(interval);
     }, [request]);
+
+    // Auto-decline when countdown reaches 0
+    useEffect(() => {
+        if (request && countdown === 0) {
+            stopRideRequestAlert();
+            onDecline();
+        }
+    }, [countdown, request, onDecline]);
 
     useEffect(() => {
         if (request) {

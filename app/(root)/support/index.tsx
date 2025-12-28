@@ -32,26 +32,29 @@ const SupportHome = () => {
 
     const renderTicket = ({ item }: { item: any }) => (
         <TouchableOpacity
-            className="bg-white p-4 rounded-xl border border-neutral-100 mb-3"
+            className="bg-white p-5 rounded-2xl border border-neutral-100 mb-4 shadow-sm"
             onPress={() => router.push(`/(root)/support/chat/${item.id}` as any)}
         >
-            <View className="flex-row justify-between items-center mb-2">
+            <View className="flex-row justify-between items-center mb-3">
                 <Text className="font-JakartaBold text-neutral-800 text-base">{item.category}</Text>
-                <View className={`px-2 py-1 rounded-full ${item.status === 'resolved' ? 'bg-green-100' : 'bg-blue-100'}`}>
-                    <Text className={`text-xs capitalize font-JakartaMedium ${item.status === 'resolved' ? 'text-green-600' : 'text-blue-600'}`}>
+                <View className={`px-3 py-1 rounded-full ${item.status === 'resolved' ? 'bg-neutral-100' : 'bg-[#9D00FF]/10'}`}>
+                    <Text className={`text-[10px] uppercase font-JakartaExtraBold ${item.status === 'resolved' ? 'text-neutral-500' : 'text-[#9D00FF]'}`}>
                         {item.status}
                     </Text>
                 </View>
             </View>
-            <Text className="text-neutral-500 text-sm" numberOfLines={1}>{item.subject}</Text>
-            <Text className="text-neutral-400 text-xs mt-2">{new Date(item.createdAt).toLocaleDateString()}</Text>
+            <Text className="text-neutral-500 text-sm font-JakartaMedium" numberOfLines={1}>{item.subject}</Text>
+            <View className="flex-row items-center mt-3">
+                <Image source={icons.point} className="w-3 h-3 mr-1.5" tintColor="#C4C4C4" />
+                <Text className="text-neutral-400 text-xs font-JakartaMedium">{new Date(item.createdAt).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })}</Text>
+            </View>
         </TouchableOpacity>
     );
 
     return (
         <SafeAreaView className="flex-1 bg-neutral-50">
             {/* Custom Header Matching RideLayout */}
-            <View className="flex flex-row items-center justify-start px-5 py-4 bg-white shadow-sm z-10">
+            <View className="flex flex-row items-center justify-start px-5 py-6 bg-white shadow-sm z-10">
                 <TouchableOpacity onPress={() => router.back()}>
                     <View className="w-10 h-10 bg-neutral-100 rounded-full items-center justify-center">
                         <Image
@@ -61,47 +64,50 @@ const SupportHome = () => {
                         />
                     </View>
                 </TouchableOpacity>
-                <Text className="text-xl font-JakartaSemiBold ml-5">
+                <Text className="text-xl font-JakartaBold ml-5">
                     Help & Support
                 </Text>
             </View>
 
-            <ScrollView className="flex-1 px-5 pt-5">
+            <ScrollView className="flex-1 px-5 pt-6" showsVerticalScrollIndicator={false}>
                 {/* FAQ Section */}
-                <Text className="text-lg font-JakartaBold mb-3">Frequently Asked Questions</Text>
-                <View className="mb-6">
+                <Text className="text-lg font-JakartaBold mb-4 text-neutral-800">Frequently Asked Questions</Text>
+                <View className="mb-8">
                     {faqs.map((faq) => (
                         <TouchableOpacity
                             key={faq.id}
                             activeOpacity={0.8}
                             onPress={() => setExpandedFaq(expandedFaq === faq.id ? null : faq.id)}
-                            className="bg-white p-4 rounded-xl border border-neutral-100 mb-2"
+                            className="bg-white p-4 rounded-xl border border-neutral-100 mb-3 shadow-sm"
                         >
                             <View className="flex-row justify-between items-center">
-                                <Text className="font-JakartaMedium text-neutral-800 flex-1">{faq.question}</Text>
+                                <Text className="font-JakartaSemiBold text-neutral-800 flex-1">{faq.question}</Text>
                                 <Image
                                     source={icons.arrowDown}
-                                    className={`w-4 h-4 tint-neutral-400 ${expandedFaq === faq.id ? 'rotate-180' : ''}`}
+                                    className={`w-4 h-4 ${expandedFaq === faq.id ? 'rotate-180' : ''}`}
+                                    style={{ tintColor: expandedFaq === faq.id ? '#9D00FF' : '#C4C4C4' }}
                                     resizeMode="contain"
                                 />
                             </View>
                             {expandedFaq === faq.id && (
-                                <Text className="text-neutral-500 text-sm mt-2 leading-5">{faq.answer}</Text>
+                                <View className="mt-3 pt-3 border-t border-neutral-50">
+                                    <Text className="text-neutral-500 text-sm leading-6 font-JakartaMedium">{faq.answer}</Text>
+                                </View>
                             )}
                         </TouchableOpacity>
                     ))}
                 </View>
 
                 {/* Recent Tickets Section */}
-                <View className="flex-row justify-between items-center mb-3">
-                    <Text className="text-lg font-JakartaBold">Recent Tickets</Text>
+                <View className="flex-row justify-between items-center mb-4">
+                    <Text className="text-lg font-JakartaBold text-neutral-800">Recent Tickets</Text>
                     <TouchableOpacity onPress={() => router.push("/(root)/support/new-ticket")}>
-                        <Text className="text-primary-500 font-JakartaMedium">Start Chat</Text>
+                        <Text className="text-[#9D00FF] font-JakartaBold">Start Chat</Text>
                     </TouchableOpacity>
                 </View>
 
                 {loading ? (
-                    <ActivityIndicator size="small" color="#0286FF" />
+                    <ActivityIndicator size="small" color="#9D00FF" />
                 ) : (ticketsData?.tickets && ticketsData.tickets.length > 0) ? (
                     <View>
                         {ticketsData.tickets.map((ticket: any) => (
@@ -109,11 +115,14 @@ const SupportHome = () => {
                         ))}
                     </View>
                 ) : (
-                    <View className="items-center justify-center py-10">
-                        <Text className="text-neutral-400">No active tickets</Text>
+                    <View className="items-center justify-center py-12 bg-white rounded-3xl border border-neutral-100 shadow-sm">
+                        <View className="w-16 h-16 bg-neutral-50 rounded-full items-center justify-center mb-4">
+                            <Image source={icons.chat} className="w-8 h-8" tintColor="#C4C4C4" resizeMode="contain" />
+                        </View>
+                        <Text className="text-neutral-400 font-JakartaBold mb-6">No active tickets yet</Text>
                         <TouchableOpacity
                             onPress={() => router.push("/(root)/support/new-ticket")}
-                            className="bg-[#0286FF] px-6 py-3 rounded-full mt-4"
+                            className="bg-[#9D00FF] px-8 py-3.5 rounded-full shadow-lg shadow-purple-200"
                         >
                             <Text className="text-white font-JakartaBold">Chat with Support</Text>
                         </TouchableOpacity>
