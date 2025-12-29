@@ -7,10 +7,35 @@ import { router } from "expo-router";
 import Avatar from "@/components/Avatar";
 import { useFetch } from "@/lib/fetch";
 import Skeleton from "@/components/Skeleton";
+import Constants from "expo-constants";
 
 const Profile = () => {
   const { user, signOut } = useUser();
   const { data: profileData, loading, error } = useFetch<any>("/api/driver/profile");
+  const { data: settingsData } = useFetch<any>("/api/settings");
+
+  // Get current app version
+  const currentVersion = Constants.expoConfig?.version || "1.0.0";
+
+  // Check if update is needed
+  const minDriverVersion = settingsData?.minDriverVersion || "1.0.0";
+  const needsUpdate = compareVersions(currentVersion, minDriverVersion) < 0;
+
+  // Version comparison function
+  function compareVersions(v1: string, v2: string): number {
+    const parts1 = v1.split(".").map(Number);
+    const parts2 = v2.split(".").map(Number);
+
+    for (let i = 0; i < Math.max(parts1.length, parts2.length); i++) {
+      const num1 = parts1[i] || 0;
+      const num2 = parts2[i] || 0;
+
+      if (num1 < num2) return -1;
+      if (num1 > num2) return 1;
+    }
+
+    return 0;
+  }
 
   const handleLogout = async () => {
     Alert.alert("Log Out", "Are you sure you want to log out?", [
@@ -38,6 +63,37 @@ const Profile = () => {
         showsVerticalScrollIndicator={false}
       >
         <Text className="text-2xl font-JakartaBold my-5 text-neutral-900">My Profile</Text>
+
+        {/* Update Notice Banner */}
+        {needsUpdate && (
+          <View className="bg-amber-50 border border-amber-200 rounded-2xl p-4 mb-6">
+            <View className="flex-row items-start">
+              <View className="w-10 h-10 bg-amber-100 rounded-full items-center justify-center mr-3">
+                <Image source={icons.info} className="w-5 h-5" tintColor="#F59E0B" resizeMode="contain" />
+              </View>
+              <View className="flex-1">
+                <Text className="text-base font-JakartaBold text-amber-900 mb-1">Update Available</Text>
+                <Text className="text-sm font-JakartaMedium text-amber-700 mb-3">
+                  A new version of the app is required. Current: v{currentVersion} → Required: v{minDriverVersion}
+                </Text>
+                <TouchableOpacity
+                  onPress={() => {
+                    const playStoreId = process.env.EXPO_PUBLIC_DRIVER_PLAY_STORE_ID || "ng.karride.driver";
+                    const appStoreId = process.env.EXPO_PUBLIC_DRIVER_APP_STORE_ID || "id123456789";
+                    const storeUrl =
+                      Constants.platform?.android
+                        ? `https://play.google.com/store/apps/details?id=${playStoreId}`
+                        : `https://apps.apple.com/app/karride-driver/${appStoreId}`;
+                    Linking.openURL(storeUrl);
+                  }}
+                  className="bg-amber-500 py-2.5 px-4 rounded-xl"
+                >
+                  <Text className="text-white font-JakartaBold text-center text-sm">Update Now</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        )}
 
         {/* Header Section */}
         <View className="flex items-center justify-center mb-8">

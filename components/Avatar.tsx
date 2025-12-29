@@ -16,7 +16,13 @@ const Avatar = ({ source, name, size = 12, className }: AvatarProps) => {
         .substring(0, 2)
         .toUpperCase();
 
-    if (source) {
+    // Validate source URL - check for empty strings, null values
+    const hasValidSource = source &&
+        source.trim() !== "" &&
+        source !== "null" &&
+        source !== "undefined";
+
+    if (hasValidSource) {
         let fullSource = source;
         const apiUrl = process.env.EXPO_PUBLIC_API_URL || "";
 
@@ -33,6 +39,7 @@ const Avatar = ({ source, name, size = 12, className }: AvatarProps) => {
                 source={{ uri: fullSource }}
                 className={`rounded-full ${className}`}
                 style={{ width: size * 4, height: size * 4 }}
+                onError={() => console.log("Failed to load avatar:", fullSource)}
             />
         );
     }
